@@ -12,4 +12,8 @@ router.route('/:id')
   .put(priceComparisonController.updatePriceComparison)
   .delete(priceComparisonController.deletePriceComparison);
 
+router.route('/compare')
+  .post(priceComparisonController.compareProductPrices);
+
+
 export default router;

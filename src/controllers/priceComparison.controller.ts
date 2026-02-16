@@ -46,6 +46,10 @@ export const updatePriceComparison = async (req: Request, res: Response, next: N
   }
 };
 
+import { IntegrationService } from '../services/integration.service';
+
+const integrationService = new IntegrationService();
+
 export const deletePriceComparison = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const priceComparison = await priceComparisonService.deletePriceComparison(req.params.id);
@@ -54,6 +58,19 @@ export const deletePriceComparison = async (req: Request, res: Response, next: N
     } else {
       res.status(404).json({ message: 'PriceComparison not found' });
     }
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const compareProductPrices = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { productName } = req.body;
+    if (!productName) {
+      return res.status(400).json({ message: 'productName is required' });
+    }
+    const comparisonResults = await integrationService.comparePrices(productName);
+    res.status(200).json(comparisonResults);
   } catch (error) {
     next(error);
   }
