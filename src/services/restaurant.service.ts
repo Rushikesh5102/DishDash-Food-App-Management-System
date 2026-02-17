@@ -1,4 +1,5 @@
 import Restaurant, { IRestaurant, IMenuItem } from '../models/restaurant.model';
+import { Types } from 'mongoose';
 
 export const createRestaurant = async (restaurantData: IRestaurant): Promise<IRestaurant> => {
     const restaurant = new Restaurant(restaurantData);
@@ -33,7 +34,7 @@ export const addMenuItem = async (restaurantId: string, menuItem: IMenuItem): Pr
 export const updateMenuItem = async (restaurantId: string, menuItemId: string, menuItemData: Partial<IMenuItem>): Promise<IRestaurant | null> => {
     const restaurant = await Restaurant.findById(restaurantId);
     if (restaurant) {
-        const menuItem = restaurant.menu.id(menuItemId);
+        const menuItem = (restaurant.menu as Types.DocumentArray<IMenuItem>).id(menuItemId);
         if (menuItem) {
             menuItem.set(menuItemData);
             return await restaurant.save();
@@ -45,11 +46,9 @@ export const updateMenuItem = async (restaurantId: string, menuItemId: string, m
 export const deleteMenuItem = async (restaurantId: string, menuItemId: string): Promise<IRestaurant | null> => {
     const restaurant = await Restaurant.findById(restaurantId);
     if (restaurant) {
-        const menuItem = restaurant.menu.id(menuItemId);
+        const menuItem = (restaurant.menu as Types.DocumentArray<IMenuItem>).id(menuItemId);
         if (menuItem) {
-            // menuItem.remove(); TODO: fix this in mongoose v8
-            const index = restaurant.menu.indexOf(menuItem);
-            restaurant.menu.splice(index, 1);
+            restaurant.menu = restaurant.menu.filter(item => item._id?.toString() !== menuItemId);
             return await restaurant.save();
         }
     }
