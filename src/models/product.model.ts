@@ -1,21 +1,32 @@
-import { Schema, model, Document } from 'mongoose';
+import { Model, DataTypes } from 'sequelize';
+import { sequelize } from '../config/db';
 
-export interface IProduct extends Document {
-  product_name: string;
-  category: string;
+class Product extends Model {
+  public id!: number;
+  public product_name!: string;
+  public category!: string;
+
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
 }
 
-const productSchema = new Schema({
+Product.init({
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
   product_name: {
-    type: String,
-    required: true,
+    type: DataTypes.STRING,
+    allowNull: false,
   },
   category: {
-    type: String,
-    required: true,
+    type: DataTypes.STRING,
+    allowNull: false,
   },
 }, {
-  timestamps: true,
+  sequelize,
+  tableName: 'products',
 });
 
-export default model<IProduct>('Product', productSchema);
+export default Product;

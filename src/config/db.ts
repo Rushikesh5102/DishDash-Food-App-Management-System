@@ -1,52 +1,30 @@
-import mongoose from 'mongoose';
 import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({ override: true });
 
-// MongoDB Connection
-const connectMongoDB = async () => {
-  try {
-    const mongoURI = process.env.MONGO_URI;
-    if (!mongoURI) {
-      throw new Error('MONGO_URI is not defined in the environment variables');
-    }
-    await mongoose.connect(mongoURI);
-    console.log('MongoDB connected');
-  } catch (err) {
-    console.error('MongoDB connection error:', err instanceof Error ? err.message : String(err));
-    process.exit(1);
-  }
-};
-
-// MySQL Connection (Sequelize)
-const sequelize = new Sequelize(
-  process.env.MYSQL_DATABASE || 'food_delivery_mysql',
+// Exporting the sequelize instance
+export const sequelize = new Sequelize(
+  process.env.MYSQL_DATABASE || 'food_delivery',
   process.env.MYSQL_USER || 'root',
-  process.env.MYSQL_PASSWORD || 'password',
+  process.env.MYSQL_PASSWORD || 'ppk40313',
   {
     host: process.env.MYSQL_HOST || 'localhost',
     dialect: 'mysql',
-    logging: false, // Set to true to see SQL queries in console
+    logging: false,
   }
 );
 
-const connectMySQL = async () => {
+// Exporting the connection function
+export const connectMySQL = async () => {
   try {
+    console.log(`Attempting to connect to MySQL at ${process.env.MYSQL_HOST || 'localhost'}...`);
+    console.log(`Database: ${process.env.MYSQL_DATABASE || 'food_delivery'}`);
+    console.log(`User: ${process.env.MYSQL_USER || 'root'}`);
     await sequelize.authenticate();
-    console.log('MySQL connected with Sequelize');
-    // await sequelize.sync({ force: false }); // Use force: true to drop existing tables
-    // console.log('All models were synchronized successfully.');
-  } catch (err) {
-    console.error('MySQL connection error:', err instanceof Error ? err.message : String(err));
+    console.log('✅ MySQL Connected successfully');
+  } catch (error) {
+    console.error('❌ Database connection failed:', error);
     process.exit(1);
   }
 };
-
-const connectDB = async () => {
-  await connectMongoDB();
-  await connectMySQL();
-};
-
-export { sequelize };
-export default connectDB;

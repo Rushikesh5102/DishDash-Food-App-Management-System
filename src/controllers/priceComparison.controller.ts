@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import * as priceComparisonService from '../services/priceComparison.service';
-import { IPriceComparison } from '../models/priceComparison.model';
 
 export const createPriceComparison = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -22,7 +21,7 @@ export const getPriceComparisons = async (req: Request, res: Response, next: Nex
 
 export const getPriceComparisonById = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const priceComparison = await priceComparisonService.getPriceComparisonById(req.params.id);
+    const priceComparison = await priceComparisonService.getPriceComparisonById(Number(req.params.id));
     if (priceComparison) {
       res.json(priceComparison);
     } else {
@@ -35,7 +34,7 @@ export const getPriceComparisonById = async (req: Request, res: Response, next: 
 
 export const updatePriceComparison = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const priceComparison = await priceComparisonService.updatePriceComparison(req.params.id, req.body);
+    const priceComparison = await priceComparisonService.updatePriceComparison(Number(req.params.id), req.body);
     if (priceComparison) {
       res.json(priceComparison);
     } else {
@@ -52,7 +51,7 @@ const integrationService = new IntegrationService();
 
 export const deletePriceComparison = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const priceComparison = await priceComparisonService.deletePriceComparison(req.params.id);
+    const priceComparison = await priceComparisonService.deletePriceComparison(Number(req.params.id));
     if (priceComparison) {
       res.json({ message: 'PriceComparison removed' });
     } else {

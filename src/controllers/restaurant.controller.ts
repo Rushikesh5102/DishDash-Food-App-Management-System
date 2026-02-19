@@ -21,7 +21,7 @@ export const getRestaurants = async (req: Request, res: Response, next: NextFunc
 
 export const getRestaurantById = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const restaurant = await restaurantService.getRestaurantById(req.params.id);
+        const restaurant = await restaurantService.getRestaurantById(Number(req.params.id));
         if (restaurant) {
             res.json(restaurant);
         } else {
@@ -34,7 +34,7 @@ export const getRestaurantById = async (req: Request, res: Response, next: NextF
 
 export const updateRestaurant = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const restaurant = await restaurantService.updateRestaurant(req.params.id, req.body);
+        const restaurant = await restaurantService.updateRestaurant(Number(req.params.id), req.body);
         if (restaurant) {
             res.json(restaurant);
         } else {
@@ -47,7 +47,7 @@ export const updateRestaurant = async (req: Request, res: Response, next: NextFu
 
 export const deleteRestaurant = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const restaurant = await restaurantService.deleteRestaurant(req.params.id);
+        const restaurant = await restaurantService.deleteRestaurant(Number(req.params.id));
         if (restaurant) {
             res.json({ message: 'Restaurant deleted' });
         } else {
@@ -60,7 +60,7 @@ export const deleteRestaurant = async (req: Request, res: Response, next: NextFu
 
 export const addMenuItem = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const restaurant = await restaurantService.addMenuItem(req.params.id, req.body);
+        const restaurant = await restaurantService.addMenuItem(Number(req.params.id), req.body);
         if (restaurant) {
             res.json(restaurant);
         } else {
@@ -73,7 +73,7 @@ export const addMenuItem = async (req: Request, res: Response, next: NextFunctio
 
 export const updateMenuItem = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const restaurant = await restaurantService.updateMenuItem(req.params.id, req.params.itemId, req.body);
+        const restaurant = await restaurantService.updateMenuItem(Number(req.params.id), Number(req.params.itemId), req.body);
         if (restaurant) {
             res.json(restaurant);
         } else {
@@ -86,7 +86,7 @@ export const updateMenuItem = async (req: Request, res: Response, next: NextFunc
 
 export const deleteMenuItem = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const restaurant = await restaurantService.deleteMenuItem(req.params.id, req.params.itemId);
+        const restaurant = await restaurantService.deleteMenuItem(Number(req.params.id), Number(req.params.itemId));
         if (restaurant) {
             res.json(restaurant);
         } else {

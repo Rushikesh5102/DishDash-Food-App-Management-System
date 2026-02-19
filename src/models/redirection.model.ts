@@ -1,30 +1,38 @@
-import { Schema, model, Document } from 'mongoose';
-import { IProduct } from './product.model';
-import { IPriceComparison } from './priceComparison.model';
+import { Model, DataTypes } from 'sequelize';
+import { sequelize } from '../config/db';
+import Product from './product.model';
+import PriceComparison from './priceComparison.model';
 
-export interface IRedirection extends Document {
-  product: IProduct['_id'];
-  priceComparison: IPriceComparison['_id'];
-  redirection_url: string;
+class Redirection extends Model {
+  public id!: number;
+  public redirection_url!: string;
+  public productId!: number;
+  public priceComparisonId!: number;
+
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
 }
 
-const redirectionSchema = new Schema({
-  product: {
-    type: Schema.Types.ObjectId,
-    ref: 'Product',
-    required: true,
-  },
-  priceComparison: {
-    type: Schema.Types.ObjectId,
-    ref: 'PriceComparison',
-    required: true,
+Redirection.init({
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
   },
   redirection_url: {
-    type: String,
-    required: true,
+    type: DataTypes.STRING,
+    allowNull: false,
   },
 }, {
-  timestamps: true,
+  sequelize,
+  tableName: 'redirections',
 });
 
-export default model<IRedirection>('Redirection', redirectionSchema);
+// Associations
+Redirection.belongsTo(Product, { foreignKey: 'productId' });
+Product.hasMany(Redirection, { foreignKey: 'productId' });
+
+Redirection.belongsTo(PriceComparison, { foreignKey: 'priceComparisonId' });
+PriceComparison.hasMany(Redirection, { foreignKey: 'priceComparisonId' });
+
+export default Redirection;

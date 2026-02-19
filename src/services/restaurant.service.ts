@@ -1,56 +1,55 @@
-import Restaurant, { IRestaurant, IMenuItem } from '../models/restaurant.model';
-import { Types } from 'mongoose';
+import { Restaurant, MenuItem } from '../models/restaurant.model';
 
-export const createRestaurant = async (restaurantData: IRestaurant): Promise<IRestaurant> => {
-    const restaurant = new Restaurant(restaurantData);
-    return await restaurant.save();
+export const createRestaurant = async (restaurantData: { name: string; address: string; cuisine: string; }): Promise<Restaurant> => {
+    return await Restaurant.create(restaurantData);
 };
 
-export const getRestaurants = async (): Promise<IRestaurant[]> => {
-    return await Restaurant.find();
+export const getRestaurants = async (): Promise<Restaurant[]> => {
+    return await Restaurant.findAll({ include: [MenuItem] });
 };
 
-export const getRestaurantById = async (id: string): Promise<IRestaurant | null> => {
-    return await Restaurant.findById(id);
+export const getRestaurantById = async (id: number): Promise<Restaurant | null> => {
+    return await Restaurant.findByPk(id, { include: [MenuItem] });
 };
 
-export const updateRestaurant = async (id: string, restaurantData: Partial<IRestaurant>): Promise<IRestaurant | null> => {
-    return await Restaurant.findByIdAndUpdate(id, restaurantData, { new: true });
-};
+export const updateRestaurant = async (id: number, restaurantData: Partial<{ name: string; address: string; cuisine: string; }>): Promise<Restaurant | null> => {
+    const [affectedCount] = await Restaurant.update(restaurantData, {
+        where: { id },
+    });
 
-export const deleteRestaurant = async (id: string): Promise<IRestaurant | null> => {
-    return await Restaurant.findByIdAndDelete(id);
-};
-
-export const addMenuItem = async (restaurantId: string, menuItem: IMenuItem): Promise<IRestaurant | null> => {
-    const restaurant = await Restaurant.findById(restaurantId);
-    if (restaurant) {
-        restaurant.menu.push(menuItem);
-        return await restaurant.save();
+    if (affectedCount > 0) {
+        return await Restaurant.findByPk(id, { include: [MenuItem] });
     }
     return null;
 };
 
-export const updateMenuItem = async (restaurantId: string, menuItemId: string, menuItemData: Partial<IMenuItem>): Promise<IRestaurant | null> => {
-    const restaurant = await Restaurant.findById(restaurantId);
+export const deleteRestaurant = async (id: number): Promise<number> => {
+    return await Restaurant.destroy({
+        where: { id },
+    });
+};
+
+export const addMenuItem = async (restaurantId: number, menuItem: { name: string; description: string; price: number; category: string; }): Promise<MenuItem | null> => {
+    const restaurant = await Restaurant.findByPk(restaurantId);
     if (restaurant) {
-        const menuItem = (restaurant.menu as Types.DocumentArray<IMenuItem>).id(menuItemId);
-        if (menuItem) {
-            menuItem.set(menuItemData);
-            return await restaurant.save();
-        }
+        return await MenuItem.create({ ...menuItem, restaurantId });
     }
     return null;
 };
 
-export const deleteMenuItem = async (restaurantId: string, menuItemId: string): Promise<IRestaurant | null> => {
-    const restaurant = await Restaurant.findById(restaurantId);
-    if (restaurant) {
-        const menuItem = (restaurant.menu as Types.DocumentArray<IMenuItem>).id(menuItemId);
-        if (menuItem) {
-            restaurant.menu = restaurant.menu.filter(item => item._id?.toString() !== menuItemId);
-            return await restaurant.save();
-        }
+export const updateMenuItem = async (restaurantId: number, menuItemId: number, menuItemData: Partial<{ name: string; description: string; price: number; category: string; }>): Promise<MenuItem | null> => {
+    const [affectedCount] = await MenuItem.update(menuItemData, {
+        where: { id: menuItemId, restaurantId },
+    });
+
+    if (affectedCount > 0) {
+        return await MenuItem.findByPk(menuItemId);
     }
     return null;
+};
+
+export const deleteMenuItem = async (restaurantId: number, menuItemId: number): Promise<number> => {
+    return await MenuItem.destroy({
+        where: { id: menuItemId, restaurantId },
+    });
 };

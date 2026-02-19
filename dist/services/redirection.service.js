@@ -14,24 +14,37 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteRedirection = exports.updateRedirection = exports.getRedirectionById = exports.getRedirections = exports.createRedirection = void 0;
 const redirection_model_1 = __importDefault(require("../models/redirection.model"));
+const product_model_1 = __importDefault(require("../models/product.model"));
+const priceComparison_model_1 = __importDefault(require("../models/priceComparison.model"));
 const createRedirection = (redirectionData) => __awaiter(void 0, void 0, void 0, function* () {
-    const redirection = new redirection_model_1.default(redirectionData);
-    return yield redirection.save();
+    return yield redirection_model_1.default.create(redirectionData);
 });
 exports.createRedirection = createRedirection;
 const getRedirections = () => __awaiter(void 0, void 0, void 0, function* () {
-    return yield redirection_model_1.default.find({}).populate('product').populate('priceComparison');
+    return yield redirection_model_1.default.findAll({
+        include: [product_model_1.default, priceComparison_model_1.default]
+    });
 });
 exports.getRedirections = getRedirections;
 const getRedirectionById = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield redirection_model_1.default.findById(id).populate('product').populate('priceComparison');
+    return yield redirection_model_1.default.findByPk(id, {
+        include: [product_model_1.default, priceComparison_model_1.default]
+    });
 });
 exports.getRedirectionById = getRedirectionById;
 const updateRedirection = (id, redirectionData) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield redirection_model_1.default.findByIdAndUpdate(id, redirectionData, { new: true });
+    const [affectedCount] = yield redirection_model_1.default.update(redirectionData, {
+        where: { id },
+    });
+    if (affectedCount > 0) {
+        return yield redirection_model_1.default.findByPk(id, { include: [product_model_1.default, priceComparison_model_1.default] });
+    }
+    return null;
 });
 exports.updateRedirection = updateRedirection;
 const deleteRedirection = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield redirection_model_1.default.findByIdAndDelete(id);
+    return yield redirection_model_1.default.destroy({
+        where: { id },
+    });
 });
 exports.deleteRedirection = deleteRedirection;

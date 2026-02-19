@@ -66,7 +66,7 @@ const getPlatforms = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
 exports.getPlatforms = getPlatforms;
 const getPlatformById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const platform = yield platformService.getPlatformById(req.params.id);
+        const platform = yield platformService.getPlatformById(parseInt(req.params.id));
         if (platform) {
             res.json(platform);
         }
@@ -81,7 +81,7 @@ const getPlatformById = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
 exports.getPlatformById = getPlatformById;
 const updatePlatform = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const platform = yield platformService.updatePlatform(req.params.id, req.body);
+        const platform = yield platformService.updatePlatform(parseInt(req.params.id), req.body);
         if (platform) {
             res.json(platform);
         }
@@ -96,8 +96,8 @@ const updatePlatform = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
 exports.updatePlatform = updatePlatform;
 const deletePlatform = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const platform = yield platformService.deletePlatform(req.params.id);
-        if (platform) {
+        const deletedCount = yield platformService.deletePlatform(parseInt(req.params.id));
+        if (deletedCount > 0) {
             res.json({ message: 'Platform removed' });
         }
         else {

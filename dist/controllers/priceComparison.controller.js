@@ -66,7 +66,7 @@ const getPriceComparisons = (req, res, next) => __awaiter(void 0, void 0, void 0
 exports.getPriceComparisons = getPriceComparisons;
 const getPriceComparisonById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const priceComparison = yield priceComparisonService.getPriceComparisonById(req.params.id);
+        const priceComparison = yield priceComparisonService.getPriceComparisonById(Number(req.params.id));
         if (priceComparison) {
             res.json(priceComparison);
         }
@@ -81,7 +81,7 @@ const getPriceComparisonById = (req, res, next) => __awaiter(void 0, void 0, voi
 exports.getPriceComparisonById = getPriceComparisonById;
 const updatePriceComparison = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const priceComparison = yield priceComparisonService.updatePriceComparison(req.params.id, req.body);
+        const priceComparison = yield priceComparisonService.updatePriceComparison(Number(req.params.id), req.body);
         if (priceComparison) {
             res.json(priceComparison);
         }
@@ -98,7 +98,7 @@ const integration_service_1 = require("../services/integration.service");
 const integrationService = new integration_service_1.IntegrationService();
 const deletePriceComparison = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const priceComparison = yield priceComparisonService.deletePriceComparison(req.params.id);
+        const priceComparison = yield priceComparisonService.deletePriceComparison(Number(req.params.id));
         if (priceComparison) {
             res.json({ message: 'PriceComparison removed' });
         }

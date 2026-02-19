@@ -8,63 +8,58 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteMenuItem = exports.updateMenuItem = exports.addMenuItem = exports.deleteRestaurant = exports.updateRestaurant = exports.getRestaurantById = exports.getRestaurants = exports.createRestaurant = void 0;
-const restaurant_model_1 = __importDefault(require("../models/restaurant.model"));
+const restaurant_model_1 = require("../models/restaurant.model");
 const createRestaurant = (restaurantData) => __awaiter(void 0, void 0, void 0, function* () {
-    const restaurant = new restaurant_model_1.default(restaurantData);
-    return yield restaurant.save();
+    return yield restaurant_model_1.Restaurant.create(restaurantData);
 });
 exports.createRestaurant = createRestaurant;
 const getRestaurants = () => __awaiter(void 0, void 0, void 0, function* () {
-    return yield restaurant_model_1.default.find();
+    return yield restaurant_model_1.Restaurant.findAll({ include: [restaurant_model_1.MenuItem] });
 });
 exports.getRestaurants = getRestaurants;
 const getRestaurantById = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield restaurant_model_1.default.findById(id);
+    return yield restaurant_model_1.Restaurant.findByPk(id, { include: [restaurant_model_1.MenuItem] });
 });
 exports.getRestaurantById = getRestaurantById;
 const updateRestaurant = (id, restaurantData) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield restaurant_model_1.default.findByIdAndUpdate(id, restaurantData, { new: true });
+    const [affectedCount] = yield restaurant_model_1.Restaurant.update(restaurantData, {
+        where: { id },
+    });
+    if (affectedCount > 0) {
+        return yield restaurant_model_1.Restaurant.findByPk(id, { include: [restaurant_model_1.MenuItem] });
+    }
+    return null;
 });
 exports.updateRestaurant = updateRestaurant;
 const deleteRestaurant = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield restaurant_model_1.default.findByIdAndDelete(id);
+    return yield restaurant_model_1.Restaurant.destroy({
+        where: { id },
+    });
 });
 exports.deleteRestaurant = deleteRestaurant;
 const addMenuItem = (restaurantId, menuItem) => __awaiter(void 0, void 0, void 0, function* () {
-    const restaurant = yield restaurant_model_1.default.findById(restaurantId);
+    const restaurant = yield restaurant_model_1.Restaurant.findByPk(restaurantId);
     if (restaurant) {
-        restaurant.menu.push(menuItem);
-        return yield restaurant.save();
+        return yield restaurant_model_1.MenuItem.create(Object.assign(Object.assign({}, menuItem), { restaurantId }));
     }
     return null;
 });
 exports.addMenuItem = addMenuItem;
 const updateMenuItem = (restaurantId, menuItemId, menuItemData) => __awaiter(void 0, void 0, void 0, function* () {
-    const restaurant = yield restaurant_model_1.default.findById(restaurantId);
-    if (restaurant) {
-        const menuItem = restaurant.menu.id(menuItemId);
-        if (menuItem) {
-            menuItem.set(menuItemData);
-            return yield restaurant.save();
-        }
+    const [affectedCount] = yield restaurant_model_1.MenuItem.update(menuItemData, {
+        where: { id: menuItemId, restaurantId },
+    });
+    if (affectedCount > 0) {
+        return yield restaurant_model_1.MenuItem.findByPk(menuItemId);
     }
     return null;
 });
 exports.updateMenuItem = updateMenuItem;
 const deleteMenuItem = (restaurantId, menuItemId) => __awaiter(void 0, void 0, void 0, function* () {
-    const restaurant = yield restaurant_model_1.default.findById(restaurantId);
-    if (restaurant) {
-        const menuItem = restaurant.menu.id(menuItemId);
-        if (menuItem) {
-            restaurant.menu = restaurant.menu.filter(item => { var _a; return ((_a = item._id) === null || _a === void 0 ? void 0 : _a.toString()) !== menuItemId; });
-            return yield restaurant.save();
-        }
-    }
-    return null;
+    return yield restaurant_model_1.MenuItem.destroy({
+        where: { id: menuItemId, restaurantId },
+    });
 });
 exports.deleteMenuItem = deleteMenuItem;

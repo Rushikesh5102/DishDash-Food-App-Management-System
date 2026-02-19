@@ -15,23 +15,30 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deletePlatform = exports.updatePlatform = exports.getPlatformById = exports.getPlatforms = exports.createPlatform = void 0;
 const platform_model_1 = __importDefault(require("../models/platform.model"));
 const createPlatform = (platformData) => __awaiter(void 0, void 0, void 0, function* () {
-    const platform = new platform_model_1.default(platformData);
-    return yield platform.save();
+    return yield platform_model_1.default.create(platformData);
 });
 exports.createPlatform = createPlatform;
 const getPlatforms = () => __awaiter(void 0, void 0, void 0, function* () {
-    return yield platform_model_1.default.find({});
+    return yield platform_model_1.default.findAll();
 });
 exports.getPlatforms = getPlatforms;
 const getPlatformById = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield platform_model_1.default.findById(id);
+    return yield platform_model_1.default.findByPk(id);
 });
 exports.getPlatformById = getPlatformById;
 const updatePlatform = (id, platformData) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield platform_model_1.default.findByIdAndUpdate(id, platformData, { new: true });
+    const [affectedCount] = yield platform_model_1.default.update(platformData, {
+        where: { id },
+    });
+    if (affectedCount > 0) {
+        return yield platform_model_1.default.findByPk(id);
+    }
+    return null;
 });
 exports.updatePlatform = updatePlatform;
 const deletePlatform = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield platform_model_1.default.findByIdAndDelete(id);
+    return yield platform_model_1.default.destroy({
+        where: { id },
+    });
 });
 exports.deletePlatform = deletePlatform;

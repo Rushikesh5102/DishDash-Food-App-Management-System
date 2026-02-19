@@ -66,7 +66,7 @@ const getRedirections = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
 exports.getRedirections = getRedirections;
 const getRedirectionById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const redirection = yield redirectionService.getRedirectionById(req.params.id);
+        const redirection = yield redirectionService.getRedirectionById(Number(req.params.id));
         if (redirection) {
             res.json(redirection);
         }
@@ -81,7 +81,7 @@ const getRedirectionById = (req, res, next) => __awaiter(void 0, void 0, void 0,
 exports.getRedirectionById = getRedirectionById;
 const updateRedirection = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const redirection = yield redirectionService.updateRedirection(req.params.id, req.body);
+        const redirection = yield redirectionService.updateRedirection(Number(req.params.id), req.body);
         if (redirection) {
             res.json(redirection);
         }
@@ -96,7 +96,7 @@ const updateRedirection = (req, res, next) => __awaiter(void 0, void 0, void 0, 
 exports.updateRedirection = updateRedirection;
 const deleteRedirection = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const redirection = yield redirectionService.deleteRedirection(req.params.id);
+        const redirection = yield redirectionService.deleteRedirection(Number(req.params.id));
         if (redirection) {
             res.json({ message: 'Redirection removed' });
         }

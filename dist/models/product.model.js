@@ -1,16 +1,25 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = require("mongoose");
-const productSchema = new mongoose_1.Schema({
+const sequelize_1 = require("sequelize");
+const db_1 = require("../config/db");
+class Product extends sequelize_1.Model {
+}
+Product.init({
+    id: {
+        type: sequelize_1.DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+    },
     product_name: {
-        type: String,
-        required: true,
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
     },
     category: {
-        type: String,
-        required: true,
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
     },
 }, {
-    timestamps: true,
+    sequelize: db_1.sequelize,
+    tableName: 'products',
 });
-exports.default = (0, mongoose_1.model)('Product', productSchema);
+exports.default = Product;

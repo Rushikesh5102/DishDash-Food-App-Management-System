@@ -23,7 +23,7 @@ const generateToken = (id) => {
 };
 const registerUser = (userData) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, email, password, address } = userData;
-    const userExists = yield user_model_1.default.findOne({ email });
+    const userExists = yield user_model_1.default.findOne({ where: { email } });
     if (userExists) {
         throw new Error('User already exists');
     }
@@ -35,11 +35,11 @@ const registerUser = (userData) => __awaiter(void 0, void 0, void 0, function* (
     });
     if (user) {
         return {
-            _id: user._id,
+            id: user.id,
             name: user.name,
             email: user.email,
             address: user.address,
-            token: generateToken(user._id),
+            token: generateToken(user.id),
         };
     }
     else {
@@ -49,13 +49,13 @@ const registerUser = (userData) => __awaiter(void 0, void 0, void 0, function* (
 exports.registerUser = registerUser;
 const loginUser = (userData) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = userData;
-    const user = yield user_model_1.default.findOne({ email });
+    const user = yield user_model_1.default.findOne({ where: { email } });
     if (user && (yield bcryptjs_1.default.compare(password, user.password))) {
         return {
-            _id: user._id,
+            id: user.id,
             name: user.name,
             email: user.email,
-            token: generateToken(user._id),
+            token: generateToken(user.id),
         };
     }
     else {
@@ -64,7 +64,7 @@ const loginUser = (userData) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.loginUser = loginUser;
 const getUserProfile = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield user_model_1.default.findById(userId).select('-password');
+    const user = yield user_model_1.default.findByPk(userId, { attributes: { exclude: ['password'] } });
     if (!user) {
         throw new Error('User not found');
     }
@@ -72,7 +72,7 @@ const getUserProfile = (userId) => __awaiter(void 0, void 0, void 0, function* (
 });
 exports.getUserProfile = getUserProfile;
 const updateUserProfile = (userId, userData) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield user_model_1.default.findById(userId);
+    const user = yield user_model_1.default.findByPk(userId);
     if (user) {
         user.name = userData.name || user.name;
         user.email = userData.email || user.email;
@@ -82,11 +82,11 @@ const updateUserProfile = (userId, userData) => __awaiter(void 0, void 0, void 0
         }
         const updatedUser = yield user.save();
         return {
-            _id: updatedUser._id,
+            id: updatedUser.id,
             name: updatedUser.name,
             email: updatedUser.email,
             address: updatedUser.address,
-            token: generateToken(updatedUser._id),
+            token: generateToken(updatedUser.id),
         };
     }
     else {

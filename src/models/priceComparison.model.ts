@@ -1,30 +1,38 @@
-import { Schema, model, Document } from 'mongoose';
-import { IUser } from './user.model';
-import { IPlatform } from './platform.model';
+import { Model, DataTypes } from 'sequelize';
+import { sequelize } from '../config/db';
+import User from './user.model';
+import Platform from './platform.model';
 
-export interface IPriceComparison extends Document {
-  user: IUser['_id'];
-  platform: IPlatform['_id'];
-  compare_price: number;
+class PriceComparison extends Model {
+  public id!: number;
+  public compare_price!: number;
+  public userId!: number;
+  public platformId!: number;
+
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
 }
 
-const priceComparisonSchema = new Schema({
-  user: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-  },
-  platform: {
-    type: Schema.Types.ObjectId,
-    ref: 'Platform',
-    required: true,
+PriceComparison.init({
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
   },
   compare_price: {
-    type: Number,
-    required: true,
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: false,
   },
 }, {
-  timestamps: true,
+  sequelize,
+  tableName: 'price_comparisons',
 });
 
-export default model<IPriceComparison>('PriceComparison', priceComparisonSchema);
+// Associations
+PriceComparison.belongsTo(User, { foreignKey: 'userId' });
+User.hasMany(PriceComparison, { foreignKey: 'userId' });
+
+PriceComparison.belongsTo(Platform, { foreignKey: 'platformId' });
+Platform.hasMany(PriceComparison, { foreignKey: 'platformId' });
+
+export default PriceComparison;

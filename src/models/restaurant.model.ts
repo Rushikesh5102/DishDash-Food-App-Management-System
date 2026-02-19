@@ -1,33 +1,79 @@
-import { Schema, model, Document } from 'mongoose';
+import { Model, DataTypes, Sequelize } from 'sequelize';
+import { sequelize } from '../config/db';
 
-const menuItemSchema = new Schema({
-  name: { type: String, required: true },
-  description: { type: String, required: true },
-  price: { type: Number, required: true },
-  category: { type: String, required: true },
-});
+class Restaurant extends Model {
+  public id!: number;
+  public name!: string;
+  public address!: string;
+  public cuisine!: string;
 
-const restaurantSchema = new Schema({
-  name: { type: String, required: true },
-  address: { type: String, required: true },
-  cuisine: { type: String, required: true },
-  menu: [menuItemSchema],
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
+}
+
+Restaurant.init({
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  address: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  cuisine: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
 }, {
-  timestamps: true,
+  sequelize,
+  tableName: 'restaurants',
 });
 
-export interface IMenuItem extends Document {
-    name: string;
-    description: string;
-    price: number;
-    category: string;
+class MenuItem extends Model {
+  public id!: number;
+  public name!: string;
+  public description!: string;
+  public price!: number;
+  public category!: string;
+  public restaurantId!: number;
+
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
 }
 
-export interface IRestaurant extends Document {
-  name: string;
-  address: string;
-  cuisine: string;
-  menu: IMenuItem[];
-}
+MenuItem.init({
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
+  price: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: false,
+  },
+  category: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+}, {
+  sequelize,
+  tableName: 'menu_items',
+});
 
-export default model<IRestaurant>('Restaurant', restaurantSchema);
+Restaurant.hasMany(MenuItem, { foreignKey: 'restaurantId' });
+MenuItem.belongsTo(Restaurant, { foreignKey: 'restaurantId' });
+
+export { Restaurant, MenuItem };

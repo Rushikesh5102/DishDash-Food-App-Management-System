@@ -1,37 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -41,22 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteProduct = exports.updateProduct = exports.getProductById = exports.getProducts = exports.createProduct = void 0;
-const productService = __importStar(require("../services/product.service"));
-const createProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const product = yield productService.createProduct(req.body);
-        res.status(201).json(product);
-    }
-    catch (error) {
-        next(error);
-    }
-});
-exports.createProduct = createProduct;
+exports.searchProduct = exports.deleteProduct = exports.updateProduct = exports.getProductById = exports.createProduct = exports.getProducts = void 0;
+const scraper_service_1 = require("../services/scraper.service");
+const Price_1 = __importDefault(require("../models/Price"));
+const Product_1 = __importDefault(require("../models/Product"));
 const getProducts = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const products = yield productService.getProducts();
+        const products = yield Product_1.default.findAll();
         res.json(products);
     }
     catch (error) {
@@ -64,15 +26,23 @@ const getProducts = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.getProducts = getProducts;
+const createProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const product = yield Product_1.default.create(req.body);
+        res.status(201).json(product);
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.createProduct = createProduct;
 const getProductById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const product = yield productService.getProductById(req.params.id);
-        if (product) {
-            res.json(product);
+        const product = yield Product_1.default.findByPk(req.params.id);
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
         }
-        else {
-            res.status(404).json({ message: 'Product not found' });
-        }
+        res.json(product);
     }
     catch (error) {
         next(error);
@@ -81,13 +51,14 @@ const getProductById = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
 exports.getProductById = getProductById;
 const updateProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const product = yield productService.updateProduct(req.params.id, req.body);
-        if (product) {
-            res.json(product);
+        const [updated] = yield Product_1.default.update(req.body, {
+            where: { id: req.params.id },
+        });
+        if (updated) {
+            const updatedProduct = yield Product_1.default.findByPk(req.params.id);
+            return res.json(updatedProduct);
         }
-        else {
-            res.status(404).json({ message: 'Product not found' });
-        }
+        res.status(404).json({ message: 'Product not found' });
     }
     catch (error) {
         next(error);
@@ -96,16 +67,47 @@ const updateProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, func
 exports.updateProduct = updateProduct;
 const deleteProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const product = yield productService.deleteProduct(req.params.id);
-        if (product) {
-            res.json({ message: 'Product removed' });
+        const deleted = yield Product_1.default.destroy({
+            where: { id: req.params.id },
+        });
+        if (deleted) {
+            return res.status(204).send();
         }
-        else {
-            res.status(404).json({ message: 'Product not found' });
-        }
+        res.status(404).json({ message: 'Product not found' });
     }
     catch (error) {
         next(error);
     }
 });
 exports.deleteProduct = deleteProduct;
+const searchProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { productName } = req.body;
+    if (!productName) {
+        return res.status(400).json({ message: 'Product name is required.' });
+    }
+    try {
+        // Find or create the product
+        const [product] = yield Product_1.default.findOrCreate({
+            where: { name: productName },
+            defaults: { name: productName }, // Add other defaults like description, imageUrl if applicable
+        });
+        // Fetch prices from the scraper service
+        const fetchedPrices = yield (0, scraper_service_1.fetchPrices)(productName);
+        // Save fetched prices to the database
+        const createdPrices = yield Promise.all(fetchedPrices.map((item) => Price_1.default.create({
+            productId: product.id,
+            platform: item.platform,
+            price: item.price,
+            timestamp: new Date(),
+        })));
+        res.status(201).json(createdPrices);
+    }
+    catch (error) {
+        console.error('Error in searchProduct:', error);
+        if (error.message.includes('Scraper Unavailable')) {
+            return res.status(503).json({ message: error.message });
+        }
+        next(error);
+    }
+});
+exports.searchProduct = searchProduct;

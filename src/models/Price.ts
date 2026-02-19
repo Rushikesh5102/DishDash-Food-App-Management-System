@@ -1,6 +1,5 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/db';
-import Product from './Product'; // Import the Product model
 
 class Price extends Model {
   public id!: number;
@@ -21,7 +20,7 @@ Price.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: Product,
+        model: 'products',
         key: 'id',
       },
     },

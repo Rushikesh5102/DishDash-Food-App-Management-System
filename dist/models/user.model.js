@@ -12,24 +12,49 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = require("mongoose");
+const sequelize_1 = require("sequelize");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const userSchema = new mongoose_1.Schema({
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    address: { type: String, required: true },
+const db_1 = require("../config/db");
+class User extends sequelize_1.Model {
+}
+User.init({
+    id: {
+        type: sequelize_1.DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+    },
+    name: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
+    },
+    email: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+    },
+    password: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
+    },
+    address: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
+    },
 }, {
+    sequelize: db_1.sequelize,
+    tableName: 'users',
     timestamps: true,
+    hooks: {
+        beforeCreate: (user) => __awaiter(void 0, void 0, void 0, function* () {
+            const salt = yield bcryptjs_1.default.genSalt(10);
+            user.password = yield bcryptjs_1.default.hash(user.password, salt);
+        }),
+        beforeUpdate: (user) => __awaiter(void 0, void 0, void 0, function* () {
+            if (user.changed('password')) {
+                const salt = yield bcryptjs_1.default.genSalt(10);
+                user.password = yield bcryptjs_1.default.hash(user.password, salt);
+            }
+        }),
+    },
 });
-userSchema.pre('save', function (next) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (!this.isModified('password')) {
-            return next();
-        }
-        const salt = yield bcryptjs_1.default.genSalt(10);
-        this.password = yield bcryptjs_1.default.hash(this.password, salt);
-        next();
-    });
-});
-exports.default = (0, mongoose_1.model)('User', userSchema);
+exports.default = User;

@@ -66,7 +66,8 @@ const loginUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function
 exports.loginUser = loginUser;
 const getUserProfile = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = yield userService.getUserProfile(req.user._id);
+        // Use (req as any) to bypass the missing 'user' property check
+        const user = yield userService.getUserProfile(req.user.id);
         res.json(user);
     }
     catch (error) {
@@ -76,7 +77,7 @@ const getUserProfile = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
 exports.getUserProfile = getUserProfile;
 const updateUserProfile = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = yield userService.updateUserProfile(req.user._id, req.body);
+        const user = yield userService.updateUserProfile(req.user.id, req.body);
         res.json(user);
     }
     catch (error) {

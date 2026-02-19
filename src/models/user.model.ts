@@ -1,29 +1,57 @@
-import { Schema, model, Document } from 'mongoose';
+import { Model, DataTypes, Sequelize } from 'sequelize';
 import bcrypt from 'bcryptjs';
+import { sequelize } from '../config/db';
 
-const userSchema = new Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  address: { type: String, required: true },
-}, {
-  timestamps: true,
-});
+class User extends Model {
+  public id!: number;
+  public name!: string;
+  public email!: string;
+  public password!: string;
+  public address!: string;
 
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
-    return next();
-  }
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
-});
-
-export interface IUser extends Document {
-  name: string;
-  email: string;
-  password?: string;
-  address: string;
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
 }
 
-export default model<IUser>('User', userSchema);
+User.init({
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  address: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+}, {
+  sequelize,
+  tableName: 'users',
+  timestamps: true,
+  hooks: {
+    beforeCreate: async (user: User) => {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(user.password, salt);
+    },
+    beforeUpdate: async (user: User) => {
+      if (user.changed('password')) {
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(user.password, salt);
+      }
+    },
+  },
+});
+
+export default User;

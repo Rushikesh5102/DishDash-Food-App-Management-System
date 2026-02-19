@@ -66,7 +66,7 @@ const getRestaurants = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
 exports.getRestaurants = getRestaurants;
 const getRestaurantById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const restaurant = yield restaurantService.getRestaurantById(req.params.id);
+        const restaurant = yield restaurantService.getRestaurantById(Number(req.params.id));
         if (restaurant) {
             res.json(restaurant);
         }
@@ -81,7 +81,7 @@ const getRestaurantById = (req, res, next) => __awaiter(void 0, void 0, void 0, 
 exports.getRestaurantById = getRestaurantById;
 const updateRestaurant = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const restaurant = yield restaurantService.updateRestaurant(req.params.id, req.body);
+        const restaurant = yield restaurantService.updateRestaurant(Number(req.params.id), req.body);
         if (restaurant) {
             res.json(restaurant);
         }
@@ -96,7 +96,7 @@ const updateRestaurant = (req, res, next) => __awaiter(void 0, void 0, void 0, f
 exports.updateRestaurant = updateRestaurant;
 const deleteRestaurant = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const restaurant = yield restaurantService.deleteRestaurant(req.params.id);
+        const restaurant = yield restaurantService.deleteRestaurant(Number(req.params.id));
         if (restaurant) {
             res.json({ message: 'Restaurant deleted' });
         }
@@ -111,7 +111,7 @@ const deleteRestaurant = (req, res, next) => __awaiter(void 0, void 0, void 0, f
 exports.deleteRestaurant = deleteRestaurant;
 const addMenuItem = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const restaurant = yield restaurantService.addMenuItem(req.params.id, req.body);
+        const restaurant = yield restaurantService.addMenuItem(Number(req.params.id), req.body);
         if (restaurant) {
             res.json(restaurant);
         }
@@ -126,7 +126,7 @@ const addMenuItem = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
 exports.addMenuItem = addMenuItem;
 const updateMenuItem = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const restaurant = yield restaurantService.updateMenuItem(req.params.id, req.params.itemId, req.body);
+        const restaurant = yield restaurantService.updateMenuItem(Number(req.params.id), Number(req.params.itemId), req.body);
         if (restaurant) {
             res.json(restaurant);
         }
@@ -141,7 +141,7 @@ const updateMenuItem = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
 exports.updateMenuItem = updateMenuItem;
 const deleteMenuItem = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const restaurant = yield restaurantService.deleteMenuItem(req.params.id, req.params.itemId);
+        const restaurant = yield restaurantService.deleteMenuItem(Number(req.params.id), Number(req.params.itemId));
         if (restaurant) {
             res.json(restaurant);
         }

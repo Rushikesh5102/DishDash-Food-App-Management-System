@@ -1,22 +1,36 @@
-import PriceComparison, { IPriceComparison } from '../models/priceComparison.model';
+import PriceComparison from '../models/priceComparison.model';
+import User from '../models/user.model';
+import Platform from '../models/platform.model';
 
-export const createPriceComparison = async (priceComparisonData: IPriceComparison) => {
-  const priceComparison = new PriceComparison(priceComparisonData);
-  return await priceComparison.save();
+export const createPriceComparison = async (priceComparisonData: any): Promise<PriceComparison> => {
+  return await PriceComparison.create(priceComparisonData);
 };
 
-export const getPriceComparisons = async () => {
-  return await PriceComparison.find({}).populate('user').populate('platform');
+export const getPriceComparisons = async (): Promise<PriceComparison[]> => {
+  return await PriceComparison.findAll({
+    include: [User, Platform]
+  });
 };
 
-export const getPriceComparisonById = async (id: string) => {
-  return await PriceComparison.findById(id).populate('user').populate('platform');
+export const getPriceComparisonById = async (id: number): Promise<PriceComparison | null> => {
+  return await PriceComparison.findByPk(id, {
+    include: [User, Platform]
+  });
 };
 
-export const updatePriceComparison = async (id: string, priceComparisonData: Partial<IPriceComparison>) => {
-  return await PriceComparison.findByIdAndUpdate(id, priceComparisonData, { new: true });
+export const updatePriceComparison = async (id: number, priceComparisonData: Partial<PriceComparison>): Promise<PriceComparison | null> => {
+  const [affectedCount] = await PriceComparison.update(priceComparisonData, {
+    where: { id },
+  });
+
+  if (affectedCount > 0) {
+    return await PriceComparison.findByPk(id, { include: [User, Platform] });
+  }
+  return null;
 };
 
-export const deletePriceComparison = async (id: string) => {
-  return await PriceComparison.findByIdAndDelete(id);
+export const deletePriceComparison = async (id: number): Promise<number> => {
+  return await PriceComparison.destroy({
+    where: { id },
+  });
 };

@@ -46,7 +46,7 @@ exports.updateOrderStatus = exports.getOrderById = exports.getOrders = exports.c
 const orderService = __importStar(require("../services/order.service"));
 const createOrder = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        req.body.user = req.user._id;
+        req.body.userId = req.user.id;
         const order = yield orderService.createOrder(req.body);
         res.status(201).json(order);
     }
@@ -67,7 +67,7 @@ const getOrders = (req, res, next) => __awaiter(void 0, void 0, void 0, function
 exports.getOrders = getOrders;
 const getOrderById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const order = yield orderService.getOrderById(req.params.id);
+        const order = yield orderService.getOrderById(parseInt(req.params.id));
         if (order) {
             res.json(order);
         }
@@ -82,7 +82,7 @@ const getOrderById = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
 exports.getOrderById = getOrderById;
 const updateOrderStatus = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const order = yield orderService.updateOrderStatus(req.params.id, req.body.status);
+        const order = yield orderService.updateOrderStatus(parseInt(req.params.id), req.body.status);
         if (order) {
             res.json(order);
         }

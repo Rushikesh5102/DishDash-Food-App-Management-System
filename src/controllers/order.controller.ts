@@ -1,14 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import * as orderService from '../services/order.service';
-import {IUser} from '../models/user.model';
 
-interface AuthRequest extends Request {
-    user?: IUser;
-}
 
-export const createOrder = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const createOrder = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        req.body.user = req.user!._id;
+        req.body.userId = (req as any).user!.id;
         const order = await orderService.createOrder(req.body);
         res.status(201).json(order);
     } catch (error) {
@@ -27,7 +23,7 @@ export const getOrders = async (req: Request, res: Response, next: NextFunction)
 
 export const getOrderById = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const order = await orderService.getOrderById(req.params.id);
+        const order = await orderService.getOrderById(parseInt(req.params.id));
         if (order) {
             res.json(order);
         } else {
@@ -40,7 +36,7 @@ export const getOrderById = async (req: Request, res: Response, next: NextFuncti
 
 export const updateOrderStatus = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const order = await orderService.updateOrderStatus(req.params.id, req.body.status);
+        const order = await orderService.updateOrderStatus(parseInt(req.params.id), req.body.status);
         if (order) {
             res.json(order);
         } else {

@@ -1,38 +1,81 @@
-import { Schema, model, Document } from 'mongoose';
+import { Model, DataTypes } from 'sequelize';
+import { sequelize } from '../config/db';
+import User from './user.model';
+import { Restaurant } from './restaurant.model';
 
-const orderItemSchema = new Schema({
-  name: { type: String, required: true },
-  quantity: { type: Number, required: true },
-  price: { type: Number, required: true },
-});
+class Order extends Model {
+  public id!: number;
+  public totalPrice!: number;
+  public status!: string;
+  public userId!: number;
+  public restaurantId!: number;
 
-const orderSchema = new Schema({
-  user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  restaurant: { type: Schema.Types.ObjectId, ref: 'Restaurant', required: true },
-  items: [orderItemSchema],
-  totalPrice: { type: Number, required: true },
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
+}
+
+Order.init({
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
+  totalPrice: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: false,
+  },
   status: {
-    type: String,
-    required: true,
-    enum: ['Pending', 'Preparing', 'Delivered', 'Cancelled'],
-    default: 'Pending',
+    type: DataTypes.ENUM('Pending', 'Preparing', 'Delivered', 'Cancelled'),
+    allowNull: false,
+    defaultValue: 'Pending',
   },
 }, {
-  timestamps: true,
+  sequelize,
+  tableName: 'orders',
 });
 
-export interface IOrderItem extends Document {
-    name: string;
-    quantity: number;
-    price: number;
+class OrderItem extends Model {
+  public id!: number;
+  public name!: string;
+  public quantity!: number;
+  public price!: number;
+  public orderId!: number;
+
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
 }
 
-export interface IOrder extends Document {
-  user: Schema.Types.ObjectId;
-  restaurant: Schema.Types.ObjectId;
-  items: IOrderItem[];
-  totalPrice: number;
-  status: string;
-}
+OrderItem.init({
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  quantity: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  price: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: false,
+  },
+}, {
+  sequelize,
+  tableName: 'order_items',
+});
 
-export default model<IOrder>('Order', orderSchema);
+// Associations
+Order.belongsTo(User, { foreignKey: 'userId' });
+User.hasMany(Order, { foreignKey: 'userId' });
+
+Order.belongsTo(Restaurant, { foreignKey: 'restaurantId' });
+Restaurant.hasMany(Order, { foreignKey: 'restaurantId' });
+
+Order.hasMany(OrderItem, { foreignKey: 'orderId' });
+OrderItem.belongsTo(Order, { foreignKey: 'orderId' });
+
+export { Order, OrderItem };

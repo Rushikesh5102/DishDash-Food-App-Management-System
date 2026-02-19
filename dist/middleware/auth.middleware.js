@@ -15,21 +15,30 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const user_model_1 = __importDefault(require("../models/user.model"));
 const auth = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     let token;
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    if ((_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.startsWith('Bearer')) {
         try {
             token = req.headers.authorization.split(' ')[1];
             const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
-            req.user = (yield user_model_1.default.findById(decoded.id).select('-password'));
-            next();
+            // CORRECT SEQUELIZE SYNTAX:
+            const user = yield user_model_1.default.findByPk(decoded.id, {
+                attributes: { exclude: ['password'] }
+            });
+            if (!user) {
+                return res.status(401).json({ message: 'User no longer exists' });
+            }
+            // Change this line:
+            req.user = user;
+            return next();
         }
         catch (error) {
-            console.error(error);
-            res.status(401).json({ message: 'Not authorized, token failed' });
+            console.error("JWT Error:", error);
+            return res.status(401).json({ message: 'Not authorized, token failed' });
         }
     }
     if (!token) {
-        res.status(401).json({ message: 'Not authorized, no token' });
+        return res.status(401).json({ message: 'Not authorized, no token' });
     }
 });
 exports.default = auth;

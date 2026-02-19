@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import * as redirectionService from '../services/redirection.service';
-import { IRedirection } from '../models/redirection.model';
 
 export const createRedirection = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -22,7 +21,7 @@ export const getRedirections = async (req: Request, res: Response, next: NextFun
 
 export const getRedirectionById = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const redirection = await redirectionService.getRedirectionById(req.params.id);
+    const redirection = await redirectionService.getRedirectionById(Number(req.params.id));
     if (redirection) {
       res.json(redirection);
     } else {
@@ -35,7 +34,7 @@ export const getRedirectionById = async (req: Request, res: Response, next: Next
 
 export const updateRedirection = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const redirection = await redirectionService.updateRedirection(req.params.id, req.body);
+    const redirection = await redirectionService.updateRedirection(Number(req.params.id), req.body);
     if (redirection) {
       res.json(redirection);
     } else {
@@ -48,7 +47,7 @@ export const updateRedirection = async (req: Request, res: Response, next: NextF
 
 export const deleteRedirection = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const redirection = await redirectionService.deleteRedirection(req.params.id);
+    const redirection = await redirectionService.deleteRedirection(Number(req.params.id));
     if (redirection) {
       res.json({ message: 'Redirection removed' });
     } else {

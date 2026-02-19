@@ -1,22 +1,33 @@
-import { Schema, model, Document } from 'mongoose';
+import { Model, DataTypes } from 'sequelize';
+import { sequelize } from '../config/db';
 
-export interface IPlatform extends Document {
-  platform_name: string;
-  service_area: string;
+class Platform extends Model {
+  public id!: number;
+  public platform_name!: string;
+  public service_area!: string;
+
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
 }
 
-const platformSchema = new Schema({
+Platform.init({
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
   platform_name: {
-    type: String,
-    required: true,
+    type: DataTypes.STRING,
+    allowNull: false,
     unique: true,
   },
   service_area: {
-    type: String,
-    required: true,
+    type: DataTypes.STRING,
+    allowNull: false,
   },
 }, {
-  timestamps: true,
+  sequelize,
+  tableName: 'platforms',
 });
 
-export default model<IPlatform>('Platform', platformSchema);
+export default Platform;
