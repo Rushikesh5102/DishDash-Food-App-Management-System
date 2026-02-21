@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import app from './app';
 import { connectMySQL, sequelize } from './config/db';
 import setupAssociations from './models/associations';

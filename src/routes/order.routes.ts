@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import * as orderController from '../controllers/order.controller';
-import auth from '../middleware/auth.middleware';
 import validate from '../middleware/validation.middleware';
 import Joi from 'joi';
 
@@ -19,14 +18,14 @@ const orderSchema = Joi.object({
 });
 
 router.route('/')
-    .get(auth, orderController.getOrders)
-    .post(auth, validate(orderSchema), orderController.createOrder);
+    .get(orderController.getOrders)
+    .post(validate(orderSchema), orderController.createOrder);
 
 router.route('/:id')
-    .get(auth, orderController.getOrderById);
+    .get(orderController.getOrderById);
 
 router.route('/:id/status')
-    .put(auth, orderController.updateOrderStatus);
+    .put(orderController.updateOrderStatus);
 
 
 export default router;
