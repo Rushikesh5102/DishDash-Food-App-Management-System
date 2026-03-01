@@ -1,142 +1,241 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Navbar from "@/components/Navbar";
 
 export default function OrdersPage() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [sortBy, setSortBy] = useState("cheapest");
 
-  const handleSearch = async () => {
-    if (!query.trim()) return;
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("recentSearches");
+    if (stored) setRecentSearches(JSON.parse(stored));
+  }, []);
+
+  const popularItems = [
+    "Chicken Biryani",
+    "Veg Burger",
+    "Paneer Butter Masala",
+    "Pizza",
+    "Fried Rice",
+  ];
+
+  useEffect(() => {
+    if (query.length > 0) {
+      const filtered = popularItems.filter((item) =>
+        item.toLowerCase().includes(query.toLowerCase())
+      );
+      setSuggestions(filtered);
+    } else {
+      setSuggestions([]);
+    }
+  }, [query]);
+
+  const handleSearch = async (searchTerm?: string) => {
+    const finalQuery = searchTerm || query;
+    if (!finalQuery.trim()) return;
 
     setLoading(true);
     setError("");
     setResults(null);
+    setSuggestions([]);
 
     try {
       const res = await fetch(
         `http://localhost:5000/api/products/compare/search?product=${encodeURIComponent(
-          query
+          finalQuery
         )}`
       );
 
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Something went wrong");
-      }
+      if (!res.ok) throw new Error(data.message);
 
       setResults(data);
+
+      const updatedRecent = [
+        finalQuery,
+        ...recentSearches.filter((r) => r !== finalQuery),
+      ].slice(0, 5);
+
+      setRecentSearches(updatedRecent);
+      localStorage.setItem(
+        "recentSearches",
+        JSON.stringify(updatedRecent)
+      );
     } catch (err: any) {
-      setError(err.message || "Failed to fetch results");
+      setError(err.message || "Error fetching results");
     }
 
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-950 to-black text-white px-6 py-16">
-      
-      {/* HERO SECTION */}
-      <div className="max-w-4xl mx-auto text-center mb-16">
-        <h1 className="text-5xl font-bold tracking-tight mb-4">
-          Compare Food Prices Instantly
-        </h1>
+    <>
+      <Navbar />
 
-        <p className="text-gray-400 text-lg">
-          Find the cheapest platform in seconds.
-        </p>
+      <div className="min-h-screen bg-gradient-to-br from-black via-slate-950 to-gray-900 text-white px-6 py-14">
 
-        {/* SEARCH BAR */}
-        <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <input
-            type="text"
-            placeholder="Search Chicken Biryani..."
-            className="w-full max-w-lg px-5 py-4 rounded-xl bg-white/10 backdrop-blur border border-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white placeholder-gray-400"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
+        {/* HERO */}
+        <div className="max-w-4xl mx-auto text-center mb-14 relative">
+          <h1 className="text-5xl font-bold tracking-tight mb-4">
+            Smart Food Price Comparison
+          </h1>
+          <p className="text-gray-400 text-lg">
+            Compare Swiggy, Zomato & Uber Eats instantly.
+          </p>
 
-          <button
-            onClick={handleSearch}
-            className="px-6 py-4 bg-emerald-500 hover:bg-emerald-600 rounded-xl font-semibold transition-all w-full sm:w-auto"
-          >
-            {loading ? "Comparing..." : "Compare"}
-          </button>
+          {/* SEARCH */}
+          <div className="mt-8 relative max-w-xl mx-auto">
+            <input
+              type="text"
+              placeholder="Search Chicken Biryani..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="w-full px-5 py-4 rounded-xl bg-white/10 border border-white/20 focus:ring-2 focus:ring-emerald-500 outline-none"
+            />
+
+            {/* AUTOCOMPLETE DROPDOWN */}
+            {(suggestions.length > 0 ||
+              (query.length === 0 && recentSearches.length > 0)) && (
+              <div className="absolute w-full mt-2 bg-slate-900 border border-white/10 rounded-xl shadow-xl text-left z-50">
+                {query.length === 0 && recentSearches.length > 0 && (
+                  <div className="p-3 text-xs text-gray-400 border-b border-white/10">
+                    Recent Searches
+                  </div>
+                )}
+
+                {(query.length > 0
+                  ? suggestions
+                  : recentSearches
+                ).map((item, index) => (
+                  <div
+                    key={index}
+                    onClick={() => {
+                      setQuery(item);
+                      handleSearch(item);
+                    }}
+                    className="px-4 py-3 hover:bg-white/10 cursor-pointer transition-all text-sm"
+                  >
+                    {item}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <button
+              onClick={() => handleSearch()}
+              className="mt-4 w-full bg-emerald-500 hover:bg-emerald-600 py-3 rounded-xl font-semibold transition-all"
+            >
+              {loading ? "Comparing..." : "Compare Prices"}
+            </button>
+          </div>
+
+          {error && <p className="mt-4 text-red-400">{error}</p>}
         </div>
 
-        {error && (
-          <p className="mt-6 text-red-400 font-medium">{error}</p>
+        {/* LOADING */}
+        {loading && (
+          <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 animate-pulse">
+            {[1, 2, 3].map((_, i) => (
+              <div
+                key={i}
+                className="bg-white/5 border border-white/10 p-8 rounded-2xl h-60"
+              ></div>
+            ))}
+          </div>
         )}
-      </div>
 
-      {/* RESULTS */}
-      {results && results.comparisons?.length > 0 && (
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-semibold mb-10 text-center">
-            Results for{" "}
-            <span className="text-emerald-400">
-              {results.product}
-            </span>
-          </h2>
+        {/* RESULTS */}
+        {results && results.comparisons?.length > 0 && (
+          <div className="max-w-6xl mx-auto">
+            <div className="flex justify-end mb-6">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-sm"
+              >
+                <option value="cheapest">Sort by Cheapest</option>
+                <option value="fastest">Sort by Fastest</option>
+              </select>
+            </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {results.comparisons.map((item: any, index: number) => {
-              const isCheapest =
-                item.platform === results.cheapest?.platform;
+            {(() => {
+              let processed = [...results.comparisons];
+
+              if (sortBy === "cheapest") {
+                processed.sort(
+                  (a: any, b: any) =>
+                    a.finalPrice - b.finalPrice
+                );
+              } else {
+                processed.sort(
+                  (a: any, b: any) =>
+                    a.etaMinutes - b.etaMinutes
+                );
+              }
 
               return (
-                <div
-                  key={index}
-                  className={`relative p-8 rounded-2xl backdrop-blur-lg border transition-all duration-300 hover:scale-105
-                    ${
-                      isCheapest
-                        ? "bg-emerald-500/10 border-emerald-500 shadow-lg shadow-emerald-500/20"
-                        : "bg-white/5 border-white/10"
-                    }`}
-                >
-                  {isCheapest && (
-                    <div className="absolute -top-3 right-4 bg-emerald-500 text-black text-xs font-bold px-3 py-1 rounded-full">
-                      BEST DEAL
+                <div className="grid md:grid-cols-2 gap-8">
+                  {processed.map((item: any, index: number) => (
+                    <div
+                      key={index}
+                      className="p-8 rounded-2xl border bg-white/5 border-white/10 hover:scale-[1.03] transition-all"
+                    >
+                      <div className="flex items-center gap-3 mb-4">
+                        <img
+                          src={`https://logo.clearbit.com/${item.platform
+                            .toLowerCase()
+                            .replace(" ", "")}.com`}
+                          className="w-8 h-8 rounded"
+                        />
+                        <h3 className="text-xl font-semibold">
+                          {item.platform}
+                        </h3>
+                      </div>
+
+                      <p className="text-gray-300 text-sm">
+                        ETA: {item.etaMinutes} mins
+                      </p>
+
+                      <div className="mt-4 text-3xl font-bold">
+                        ₹{item.finalPrice}
+                      </div>
+
+                      <button
+                        onClick={() =>
+                          window.open(
+                            item.redirectUrl,
+                            "_blank"
+                          )
+                        }
+                        className="mt-6 w-full py-3 rounded-xl font-semibold bg-emerald-500 hover:bg-emerald-600 text-black transition-all"
+                      >
+                        Order Now
+                      </button>
                     </div>
-                  )}
-
-                  <h3 className="text-2xl font-semibold mb-4">
-                    {item.platform}
-                  </h3>
-
-                  <div className="space-y-2 text-gray-300 text-sm">
-                    <p>Base Price: ₹{item.basePrice}</p>
-                    <p>Delivery Fee: ₹{item.deliveryFee}</p>
-                    <p>Discount: -₹{item.discount}</p>
-                    <p>ETA: {item.etaMinutes} mins</p>
-                  </div>
-
-                  <div className="mt-6 text-3xl font-bold text-white">
-                    ₹{item.finalPrice}
-                  </div>
-
-                  <button
-                    onClick={() =>
-                      window.open(item.redirectUrl, "_blank")
-                    }
-                    className={`mt-6 w-full py-3 rounded-xl font-semibold transition-all
-                      ${
-                        isCheapest
-                          ? "bg-emerald-500 hover:bg-emerald-600 text-black"
-                          : "bg-white/10 hover:bg-white/20 text-white"
-                      }`}
-                  >
-                    Order Now
-                  </button>
+                  ))}
                 </div>
               );
-            })}
+            })()}
           </div>
-        </div>
-      )}
-    </div>
+        )}
+
+        {!results && !loading && (
+          <div className="text-center text-gray-500 mt-24">
+            🍽️ Search a dish to start comparing
+          </div>
+        )}
+
+        <footer className="mt-24 text-center text-gray-600 text-sm">
+          © 2026 DishDash • Compare smarter, order better
+        </footer>
+      </div>
+    </>
   );
 }
