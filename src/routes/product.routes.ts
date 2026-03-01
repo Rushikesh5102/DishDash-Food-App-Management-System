@@ -3,15 +3,31 @@ import * as productController from '../controllers/product.controller';
 
 const router = Router();
 
-router.route('/')
-  .post(productController.createProduct)
-  .get(productController.getProducts);
+/* ===========================
+   PRODUCTS
+=========================== */
 
-router.post('/search', productController.searchProduct);
+// Create product
+router.post('/', productController.createProduct);
 
-router.route('/:id')
-  .get(productController.getProductById)
-  .put(productController.updateProduct)
-  .delete(productController.deleteProduct);
+// Get all products
+router.get('/', productController.getProducts);
+
+// Get single product
+router.get('/:id', productController.getProductById);
+
+/* ===========================
+   PLATFORM LISTINGS
+=========================== */
+
+// Add listing for product
+router.post('/listing', productController.addPlatformListing);
+
+/* ===========================
+   COMPARE PRODUCT
+=========================== */
+
+// Compare product prices
+router.get('/compare/search', productController.compareSearch);
 
 export default router;

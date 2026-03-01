@@ -1,10 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import * as orderService from '../services/order.service';
 
-
 export const createOrder = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        req.body.userId = (req as any).user!.id;
         const order = await orderService.createOrder(req.body);
         res.status(201).json(order);
     } catch (error) {
@@ -36,11 +34,29 @@ export const getOrderById = async (req: Request, res: Response, next: NextFuncti
 
 export const updateOrderStatus = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const order = await orderService.updateOrderStatus(parseInt(req.params.id), req.body.status);
+        const order = await orderService.updateOrderStatus(
+            parseInt(req.params.id),
+            req.body.status
+        );
+
         if (order) {
             res.json(order);
         } else {
             res.status(404).json({ message: 'Order not found' });
+        }
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const deleteOrder = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const deleted = await orderService.deleteOrder(parseInt(req.params.id));
+
+        if (deleted) {
+            res.json({ message: "Order deleted successfully" });
+        } else {
+            res.status(404).json({ message: "Order not found" });
         }
     } catch (error) {
         next(error);

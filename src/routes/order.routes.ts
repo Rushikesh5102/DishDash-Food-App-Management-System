@@ -6,26 +6,32 @@ import Joi from 'joi';
 const router = Router();
 
 const orderItemSchema = Joi.object({
-    name: Joi.string().required(),
-    quantity: Joi.number().required(),
-    price: Joi.number().required(),
+  name: Joi.string().required(),
+  quantity: Joi.number().required(),
+  price: Joi.number().required(),
 });
 
 const orderSchema = Joi.object({
-    restaurant: Joi.string().required(),
-    items: Joi.array().items(orderItemSchema).required(),
-    totalPrice: Joi.number().required(),
+  restaurantId: Joi.number().required(),
+  userId: Joi.number().optional(),
+  items: Joi.array().items(orderItemSchema).required(),
+  totalPrice: Joi.number().required(),
+  status: Joi.string().optional(),
 });
 
-router.route('/')
-    .get(orderController.getOrders)
-    .post(validate(orderSchema), orderController.createOrder);
+// GET all orders
+router.get('/', orderController.getOrders);
 
-router.route('/:id')
-    .get(orderController.getOrderById);
+// CREATE order
+router.post('/', validate(orderSchema), orderController.createOrder);
 
-router.route('/:id/status')
-    .put(orderController.updateOrderStatus);
+// GET single order
+router.get('/:id', orderController.getOrderById);
 
+// UPDATE order status
+router.put('/:id/status', orderController.updateOrderStatus);
+
+// DELETE order
+router.delete('/:id', orderController.deleteOrder);
 
 export default router;

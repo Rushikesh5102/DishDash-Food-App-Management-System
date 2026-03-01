@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import app from './app';
 import { connectMySQL, sequelize } from './config/db';
-import setupAssociations from './models/associations';
+
 
 const start = async () => {
   try {
@@ -10,7 +10,7 @@ const start = async () => {
     await connectMySQL();
     
     // 2. Setup Associations
-    setupAssociations();
+    
 
     // 3. Sync Tables
     await sequelize.sync({ alter: true });

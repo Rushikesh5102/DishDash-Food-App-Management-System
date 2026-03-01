@@ -1,102 +1,163 @@
-import { Request, Response, NextFunction } from 'express';
-import { fetchPrices } from '../services/scraper.service';
-import Price from '../models/Price';
-import Product from '../models/Product';
+import { Request, Response } from 'express';
+import { Op } from 'sequelize';
+import Product from '../models/product.model';
+import Platform from '../models/platform.model';
+import PlatformListing from '../models/platformListing.model';
 
-export const getProducts = async (req: Request, res: Response, next: NextFunction) => {
+/* =========================
+   CREATE PRODUCT
+========================= */
+export const createProduct = async (req: Request, res: Response) => {
+  try {
+    const { name, category, restaurantName, imageUrl } = req.body;
+
+    const product = await Product.create({
+      name,
+      category,
+      restaurantName,
+      imageUrl,
+    });
+
+    res.status(201).json(product);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error creating product' });
+  }
+};
+
+/* =========================
+   GET ALL PRODUCTS
+========================= */
+export const getProducts = async (_req: Request, res: Response) => {
   try {
     const products = await Product.findAll();
     res.json(products);
   } catch (error) {
-    next(error);
+    res.status(500).json({ message: 'Error fetching products' });
   }
 };
 
-export const createProduct = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const product = await Product.create(req.body);
-    res.status(201).json(product);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const getProductById = async (req: Request, res: Response, next: NextFunction) => {
+/* =========================
+   GET PRODUCT BY ID
+========================= */
+export const getProductById = async (req: Request, res: Response) => {
   try {
     const product = await Product.findByPk(req.params.id);
+
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
+
     res.json(product);
   } catch (error) {
-    next(error);
+    res.status(500).json({ message: 'Error fetching product' });
   }
 };
 
-export const updateProduct = async (req: Request, res: Response, next: NextFunction) => {
+/* =========================
+   ADD PLATFORM LISTING
+========================= */
+export const addPlatformListing = async (req: Request, res: Response) => {
   try {
-    const [updated] = await Product.update(req.body, {
-      where: { id: req.params.id },
+    const {
+      productId,
+      platformId,
+      price,
+      deliveryFee,
+      discountType,
+      discountValue,
+      etaMinutes,
+      redirectUrl,
+    } = req.body;
+
+    const listing = await PlatformListing.create({
+      productId,
+      platformId,
+      price,
+      deliveryFee,
+      discountType,
+      discountValue,
+      etaMinutes,
+      redirectUrl,
     });
-    if (updated) {
-      const updatedProduct = await Product.findByPk(req.params.id);
-      return res.json(updatedProduct);
-    }
-    res.status(404).json({ message: 'Product not found' });
+
+    res.status(201).json(listing);
   } catch (error) {
-    next(error);
+    console.error(error);
+    res.status(500).json({ message: 'Error adding listing' });
   }
 };
 
-export const deleteProduct = async (req: Request, res: Response, next: NextFunction) => {
+/* =========================
+   SEARCH + COMPARE
+========================= */
+export const compareSearch = async (req: Request, res: Response) => {
   try {
-    const deleted = await Product.destroy({
-      where: { id: req.params.id },
-    });
-    if (deleted) {
-      return res.status(204).send();
+    const { product } = req.query;
+
+    if (!product) {
+      return res.status(400).json({ message: 'Product query required' });
     }
-    res.status(404).json({ message: 'Product not found' });
-  } catch (error) {
-    next(error);
-  }
-};
 
-export const searchProduct = async (req: Request, res: Response, next: NextFunction) => {
-  const { productName } = req.body;
-
-  if (!productName) {
-    return res.status(400).json({ message: 'Product name is required.' });
-  }
-
-  try {
-    // Find or create the product
-    const [product] = await Product.findOrCreate({
-      where: { name: productName },
-      defaults: { name: productName }, // Add other defaults like description, imageUrl if applicable
+    // ✅ Correct column name is "name"
+    const foundProduct = await Product.findOne({
+      where: {
+        name: {
+          [Op.like]: `%${product}%`,
+        },
+      },
     });
 
-    // Fetch prices from the scraper service
-    const fetchedPrices = await fetchPrices(productName);
+    if (!foundProduct) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
 
-    // Save fetched prices to the database
-    const createdPrices = await Promise.all(
-      fetchedPrices.map((item: { platform: string; price: number }) =>
-        Price.create({
-          productId: product.id,
-          platform: item.platform,
-          price: item.price,
-          timestamp: new Date(),
-        })
-      )
+    const listings = await PlatformListing.findAll({
+      where: { productId: foundProduct.id },
+      include: [{ model: Platform }],
+    });
+
+    if (!listings.length) {
+      return res.status(404).json({ message: 'No listings found' });
+    }
+
+    const comparisons = listings.map((listing: any) => {
+      const basePrice = parseFloat(listing.price);
+      const deliveryFee = parseFloat(listing.deliveryFee || 0);
+      const discountValue = parseFloat(listing.discountValue || 0);
+
+      let discount = 0;
+
+      if (listing.discountType === 'percentage') {
+        discount = (basePrice * discountValue) / 100;
+      } else if (listing.discountType === 'flat') {
+        discount = discountValue;
+      }
+
+      const finalPrice = basePrice + deliveryFee - discount;
+
+      return {
+        platform: listing.Platform.name,
+        basePrice,
+        deliveryFee,
+        discount,
+        finalPrice,
+        etaMinutes: listing.etaMinutes,
+        redirectUrl: listing.redirectUrl,
+      };
+    });
+
+    const cheapest = comparisons.reduce((min, curr) =>
+      curr.finalPrice < min.finalPrice ? curr : min
     );
 
-    res.status(201).json(createdPrices);
-  } catch (error: any) {
-    console.error('Error in searchProduct:', error);
-    if (error.message.includes('Scraper Unavailable')) {
-      return res.status(503).json({ message: error.message });
-    }
-    next(error);
+    res.json({
+      product: foundProduct.name,
+      comparisons,
+      cheapest,
+    });
+  } catch (error) {
+    console.error('Comparison error:', error);
+    res.status(500).json({ message: 'Error comparing prices' });
   }
 };
