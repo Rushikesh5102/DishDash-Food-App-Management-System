@@ -42,11 +42,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateOrderStatus = exports.getOrderById = exports.getOrders = exports.createOrder = void 0;
+exports.deleteOrder = exports.updateOrderStatus = exports.getOrderById = exports.getOrders = exports.createOrder = void 0;
 const orderService = __importStar(require("../services/order.service"));
 const createOrder = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        req.body.userId = req.user.id;
         const order = yield orderService.createOrder(req.body);
         res.status(201).json(order);
     }
@@ -95,3 +94,18 @@ const updateOrderStatus = (req, res, next) => __awaiter(void 0, void 0, void 0, 
     }
 });
 exports.updateOrderStatus = updateOrderStatus;
+const deleteOrder = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const deleted = yield orderService.deleteOrder(parseInt(req.params.id));
+        if (deleted) {
+            res.json({ message: "Order deleted successfully" });
+        }
+        else {
+            res.status(404).json({ message: "Order not found" });
+        }
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.deleteOrder = deleteOrder;

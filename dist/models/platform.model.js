@@ -10,17 +10,22 @@ Platform.init({
         autoIncrement: true,
         primaryKey: true,
     },
-    platform_name: {
+    name: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
         unique: true,
     },
-    service_area: {
+    logoUrl: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: true,
+    },
+    serviceArea: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
     },
 }, {
     sequelize: db_1.sequelize,
     tableName: 'platforms',
+    timestamps: true,
 });
 exports.default = Platform;

@@ -12,15 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 const app_1 = __importDefault(require("./app"));
 const db_1 = require("./config/db");
-const associations_1 = __importDefault(require("./models/associations"));
 const start = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // 1. Connect to Database
         yield (0, db_1.connectMySQL)();
         // 2. Setup Associations
-        (0, associations_1.default)();
         // 3. Sync Tables
         yield db_1.sequelize.sync({ alter: true });
         // 4. Start Express

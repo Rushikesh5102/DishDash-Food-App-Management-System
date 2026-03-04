@@ -36,12 +36,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const productController = __importStar(require("../controllers/product.controller"));
 const router = (0, express_1.Router)();
-router.route('/')
-    .post(productController.createProduct)
-    .get(productController.getProducts);
-router.post('/search', productController.searchProduct);
-router.route('/:id')
-    .get(productController.getProductById)
-    .put(productController.updateProduct)
-    .delete(productController.deleteProduct);
+/* ===========================
+   PRODUCTS
+=========================== */
+// Create product
+router.post('/', productController.createProduct);
+// Get all products
+router.get('/', productController.getProducts);
+// Get single product
+router.get('/:id', productController.getProductById);
+/* ===========================
+   PLATFORM LISTINGS
+=========================== */
+// Add listing for product
+router.post('/listing', productController.addPlatformListing);
+/* ===========================
+   COMPARE PRODUCT
+=========================== */
+// Compare product prices
+router.get('/compare/search', productController.compareSearch);
 exports.default = router;
