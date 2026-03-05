@@ -11,8 +11,6 @@ const product_routes_1 = __importDefault(require("./routes/product.routes"));
 const platform_routes_1 = __importDefault(require("./routes/platform.routes"));
 const order_routes_1 = __importDefault(require("./routes/order.routes"));
 const restaurant_routes_1 = __importDefault(require("./routes/restaurant.routes"));
-const redirection_routes_1 = __importDefault(require("./routes/redirection.routes"));
-const priceComparison_routes_1 = __importDefault(require("./routes/priceComparison.routes"));
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
@@ -22,7 +20,5 @@ app.use('/api/products', product_routes_1.default);
 app.use('/api/platforms', platform_routes_1.default);
 app.use('/api/orders', order_routes_1.default);
 app.use('/api/restaurants', restaurant_routes_1.default);
-app.use('/api/redirections', redirection_routes_1.default);
-app.use('/api/price-comparisons', priceComparison_routes_1.default);
 app.use(error_middleware_1.default);
 exports.default = app; // This allows server.ts to use it

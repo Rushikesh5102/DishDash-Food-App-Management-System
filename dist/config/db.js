@@ -17,7 +17,7 @@ const sequelize_1 = require("sequelize");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config({ override: true });
 // Exporting the sequelize instance
-exports.sequelize = new sequelize_1.Sequelize(process.env.MYSQL_DATABASE || 'food_delivery', process.env.MYSQL_USER || 'root', process.env.MYSQL_PASSWORD || 'ppk40313', {
+exports.sequelize = new sequelize_1.Sequelize(process.env.MYSQL_DATABASE || 'food_delivery', process.env.MYSQL_USER || 'root', process.env.MYSQL_PASSWORD || 'root', {
     host: process.env.MYSQL_HOST || 'localhost',
     dialect: 'mysql',
     logging: false,

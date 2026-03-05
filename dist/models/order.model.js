@@ -26,9 +26,18 @@ Order.init({
         allowNull: false,
         defaultValue: 'Pending',
     },
+    userId: {
+        type: sequelize_1.DataTypes.INTEGER,
+        allowNull: false,
+    },
+    restaurantId: {
+        type: sequelize_1.DataTypes.INTEGER,
+        allowNull: false,
+    },
 }, {
     sequelize: db_1.sequelize,
     tableName: 'orders',
+    timestamps: true,
 });
 class OrderItem extends sequelize_1.Model {
 }
@@ -51,14 +60,36 @@ OrderItem.init({
         type: sequelize_1.DataTypes.DECIMAL(10, 2),
         allowNull: false,
     },
+    orderId: {
+        type: sequelize_1.DataTypes.INTEGER,
+        allowNull: false,
+    },
 }, {
     sequelize: db_1.sequelize,
     tableName: 'order_items',
+    timestamps: true,
 });
-// Associations
-Order.belongsTo(user_model_1.default, { foreignKey: 'userId' });
-user_model_1.default.hasMany(Order, { foreignKey: 'userId' });
-Order.belongsTo(restaurant_model_1.Restaurant, { foreignKey: 'restaurantId' });
-restaurant_model_1.Restaurant.hasMany(Order, { foreignKey: 'restaurantId' });
-Order.hasMany(OrderItem, { foreignKey: 'orderId' });
-OrderItem.belongsTo(Order, { foreignKey: 'orderId' });
+/* ===========================
+   ASSOCIATIONS
+=========================== */
+Order.belongsTo(user_model_1.default, {
+    foreignKey: 'userId',
+    onDelete: 'CASCADE',
+});
+user_model_1.default.hasMany(Order, {
+    foreignKey: 'userId',
+});
+Order.belongsTo(restaurant_model_1.Restaurant, {
+    foreignKey: 'restaurantId',
+    onDelete: 'CASCADE',
+});
+restaurant_model_1.Restaurant.hasMany(Order, {
+    foreignKey: 'restaurantId',
+});
+Order.hasMany(OrderItem, {
+    foreignKey: 'orderId',
+    onDelete: 'CASCADE',
+});
+OrderItem.belongsTo(Order, {
+    foreignKey: 'orderId',
+});

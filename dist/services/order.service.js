@@ -23,10 +23,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateOrderStatus = exports.getOrderById = exports.getOrders = exports.createOrder = void 0;
+exports.deleteOrder = exports.updateOrderStatus = exports.getOrderById = exports.getOrders = exports.createOrder = void 0;
 const order_model_1 = require("../models/order.model");
 const user_model_1 = __importDefault(require("../models/user.model"));
 const restaurant_model_1 = require("../models/restaurant.model");
+/* ===========================
+   CREATE ORDER
+=========================== */
 const createOrder = (orderData) => __awaiter(void 0, void 0, void 0, function* () {
     const { items } = orderData, orderHeader = __rest(orderData, ["items"]);
     const order = yield order_model_1.Order.create(orderHeader);
@@ -38,44 +41,67 @@ const createOrder = (orderData) => __awaiter(void 0, void 0, void 0, function* (
         include: [
             { model: user_model_1.default, attributes: ['name'] },
             { model: restaurant_model_1.Restaurant, attributes: ['name'] },
-            { model: order_model_1.OrderItem }
-        ]
+            { model: order_model_1.OrderItem },
+        ],
     }));
 });
 exports.createOrder = createOrder;
+/* ===========================
+   GET ALL ORDERS
+=========================== */
 const getOrders = () => __awaiter(void 0, void 0, void 0, function* () {
     return yield order_model_1.Order.findAll({
         include: [
             { model: user_model_1.default, attributes: ['name'] },
             { model: restaurant_model_1.Restaurant, attributes: ['name'] },
-            { model: order_model_1.OrderItem }
-        ]
+            { model: order_model_1.OrderItem },
+        ],
     });
 });
 exports.getOrders = getOrders;
+/* ===========================
+   GET ORDER BY ID
+=========================== */
 const getOrderById = (id) => __awaiter(void 0, void 0, void 0, function* () {
     return yield order_model_1.Order.findByPk(id, {
         include: [
             { model: user_model_1.default, attributes: ['name'] },
             { model: restaurant_model_1.Restaurant, attributes: ['name'] },
-            { model: order_model_1.OrderItem }
-        ]
+            { model: order_model_1.OrderItem },
+        ],
     });
 });
 exports.getOrderById = getOrderById;
+/* ===========================
+   UPDATE ORDER STATUS
+=========================== */
 const updateOrderStatus = (id, status) => __awaiter(void 0, void 0, void 0, function* () {
     const order = yield order_model_1.Order.findByPk(id);
-    if (order) {
-        order.status = status;
-        yield order.save();
-        return (yield order_model_1.Order.findByPk(order.id, {
-            include: [
-                { model: user_model_1.default, attributes: ['name'] },
-                { model: restaurant_model_1.Restaurant, attributes: ['name'] },
-                { model: order_model_1.OrderItem }
-            ]
-        }));
-    }
-    return null;
+    if (!order)
+        return null;
+    order.status = status;
+    yield order.save();
+    return yield order_model_1.Order.findByPk(id, {
+        include: [
+            { model: user_model_1.default, attributes: ['name'] },
+            { model: restaurant_model_1.Restaurant, attributes: ['name'] },
+            { model: order_model_1.OrderItem },
+        ],
+    });
 });
 exports.updateOrderStatus = updateOrderStatus;
+/* ===========================
+   DELETE ORDER
+=========================== */
+const deleteOrder = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const order = yield order_model_1.Order.findByPk(id);
+    if (!order)
+        return false;
+    // Delete related order items first (safe even if cascade exists)
+    yield order_model_1.OrderItem.destroy({
+        where: { orderId: id },
+    });
+    yield order.destroy();
+    return true;
+});
+exports.deleteOrder = deleteOrder;
