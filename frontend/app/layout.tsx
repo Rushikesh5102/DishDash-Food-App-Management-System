@@ -11,7 +11,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-slate-900 text-white">
+      <body className="bg-[#fff0f5] text-[#3b2f2f]">
         <Toaster position="top-right" />
         <div className="flex min-h-screen">
           <Sidebar />

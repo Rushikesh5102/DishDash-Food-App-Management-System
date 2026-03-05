@@ -20,7 +20,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0c0a0d] text-white overflow-hidden relative">
+    <div className="min-h-screen bg-[#fff0f5] text-[#3b2f2f] overflow-hidden relative">
 
       {/* ANIMATED LUXURY BACKGROUND */}
       <motion.div
@@ -32,10 +32,10 @@ export default function Home() {
           repeat: Infinity,
           ease: "linear",
         }}
-        className="absolute inset-0 opacity-[0.15] blur-3xl"
+        className="absolute inset-0 opacity-[0.2] blur-3xl"
         style={{
           background:
-            "linear-gradient(120deg, #fbc2eb, #fcd6a4, #fbc2eb, #fcd6a4)",
+            "linear-gradient(120deg, #daa520, #ffb6d9, #daa520, #ffb6d9)",
           backgroundSize: "300% 300%",
         }}
       />
@@ -45,12 +45,12 @@ export default function Home() {
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8 }}
-        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 backdrop-blur-xl bg-white/5 border border-white/10 px-10 py-4 rounded-full flex items-center justify-between w-[90%] max-w-6xl shadow-2xl"
+        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 backdrop-blur-xl bg-white/80 border border-[#daa520]/20 px-10 py-4 rounded-full flex items-center justify-between w-[90%] max-w-6xl shadow-2xl"
       >
         <motion.h1
           animate={{ backgroundPosition: ["0%", "100%", "0%"] }}
           transition={{ duration: 6, repeat: Infinity }}
-          className="text-xl font-semibold bg-gradient-to-r from-rose-200 via-pink-300 to-amber-200 bg-[length:200%_200%] bg-clip-text text-transparent"
+          className="text-xl font-semibold bg-gradient-to-r from-[#daa520] via-[#ffb6d9] to-[#daa520] bg-[length:200%_200%] bg-clip-text text-transparent"
         >
           DishDash
         </motion.h1>
@@ -59,7 +59,7 @@ export default function Home() {
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => router.push("/orders")}
-          className="bg-gradient-to-r from-rose-300 via-pink-400 to-amber-300 text-black px-6 py-2 rounded-full font-medium shadow-xl hover:shadow-pink-500/30 transition-all"
+          className="bg-gradient-to-r from-[#daa520] via-[#ffb6d9] to-[#daa520] text-[#3b2f2f] px-6 py-2 rounded-full font-medium shadow-xl hover:shadow-[#daa520]/30 transition-all"
         >
           Compare
         </motion.button>
@@ -77,7 +77,7 @@ export default function Home() {
         >
           Redefining
           <br />
-          <span className="bg-gradient-to-r from-rose-200 via-pink-300 to-amber-200 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-[#daa520] via-[#ffb6d9] to-[#daa520] bg-clip-text text-transparent">
             Food Comparison.
           </span>
         </motion.h2>
@@ -87,7 +87,7 @@ export default function Home() {
           animate="visible"
           variants={fadeUp}
           custom={1}
-          className="text-gray-400 text-xl max-w-2xl mx-auto mb-14"
+          className="text-[#8b7b7b] text-xl max-w-2xl mx-auto mb-14"
         >
           An elegant way to compare delivery fees, discounts and total price —
           across platforms instantly.
@@ -101,7 +101,7 @@ export default function Home() {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => router.push("/orders")}
-          className="bg-gradient-to-r from-rose-300 via-pink-400 to-amber-300 text-black px-14 py-5 rounded-full font-semibold text-lg shadow-2xl hover:shadow-pink-500/30 transition-all"
+          className="bg-gradient-to-r from-[#daa520] via-[#ffb6d9] to-[#daa520] text-[#3b2f2f] px-14 py-5 rounded-full font-semibold text-lg shadow-2xl hover:shadow-[#daa520]/30 transition-all"
         >
           Start Comparing
         </motion.button>
@@ -132,14 +132,14 @@ export default function Home() {
             variants={fadeUp}
             custom={i}
             whileHover={{ scale: 1.05 }}
-            className="relative bg-white/5 border border-white/10 backdrop-blur-lg rounded-3xl p-10 shadow-xl transition-all"
+            className="relative bg-white/50 border border-[#daa520]/20 backdrop-blur-lg rounded-3xl p-10 shadow-xl transition-all"
           >
-            <div className="absolute inset-0 rounded-3xl opacity-0 hover:opacity-100 transition-opacity bg-gradient-to-br from-rose-200/10 via-pink-300/10 to-amber-200/10 blur-xl" />
+            <div className="absolute inset-0 rounded-3xl opacity-0 hover:opacity-100 transition-opacity bg-gradient-to-br from-[#daa520]/10 via-[#ffb6d9]/10 to-[#daa520]/10 blur-xl" />
 
-            <h3 className="text-2xl font-semibold mb-4 bg-gradient-to-r from-rose-200 to-pink-300 bg-clip-text text-transparent">
+            <h3 className="text-2xl font-semibold mb-4 bg-gradient-to-r from-[#daa520] to-[#ffb6d9] bg-clip-text text-transparent">
               {item.title}
             </h3>
-            <p className="text-gray-400">{item.desc}</p>
+            <p className="text-[#8b7b7b]">{item.desc}</p>
           </motion.div>
         ))}
       </section>
@@ -151,7 +151,7 @@ export default function Home() {
         transition={{ duration: 1 }}
         className="relative z-10 text-center py-32 border-t border-white/10"
       >
-        <h2 className="text-5xl font-semibold mb-10 tracking-tight">
+        <h2 className="text-5xl font-semibold mb-10 tracking-tight text-[#3b2f2f]">
           Luxury Meets Utility.
         </h2>
 
@@ -159,14 +159,14 @@ export default function Home() {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => router.push("/orders")}
-          className="bg-gradient-to-r from-rose-300 via-pink-400 to-amber-300 text-black px-16 py-6 rounded-full font-semibold text-xl shadow-2xl hover:shadow-pink-500/30 transition-all"
+          className="bg-gradient-to-r from-[#daa520] via-[#ffb6d9] to-[#daa520] text-[#3b2f2f] px-16 py-6 rounded-full font-semibold text-xl shadow-2xl hover:shadow-[#daa520]/30 transition-all"
         >
           Compare Your Next Meal
         </motion.button>
       </motion.section>
 
       {/* FOOTER */}
-      <footer className="relative z-10 text-center text-gray-500 py-14 tracking-wide">
+      <footer className="relative z-10 text-center text-[#b8a8a8] py-14 tracking-wide">
         © 2026 DishDash — Crafted with Elegance
       </footer>
     </div>

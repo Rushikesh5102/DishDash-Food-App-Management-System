@@ -16,8 +16,8 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="w-64 bg-slate-800 border-r border-slate-700 p-6">
-      <h1 className="text-2xl font-bold text-indigo-400 mb-10">
+    <aside className="w-64 bg-white/50 border-r border-[#daa520]/20 p-6">
+      <h1 className="text-2xl font-bold text-[#daa520] mb-10">
         DishDash Pro
       </h1>
 
@@ -31,8 +31,8 @@ export default function Sidebar() {
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition 
-                ${active ? "bg-indigo-600" : "hover:bg-slate-700"}`}
+                className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition text-[#3b2f2f] 
+                ${active ? "bg-[#daa520]/20 text-[#daa520]" : "hover:bg-[#ffb6d9]/10"}`}
               >
                 <Icon size={20} />
                 {link.name}
