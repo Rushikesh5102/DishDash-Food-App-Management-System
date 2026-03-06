@@ -3,7 +3,7 @@ import { Op } from 'sequelize';
 import Product from '../models/product.model';
 import Platform from '../models/platform.model';
 import PlatformListing from '../models/platformListing.model';
-import Restaurant from '../models/restaurant.model';
+import { Restaurant } from '../models/restaurant.model';
 
 /* =========================
    CREATE PRODUCT
@@ -286,6 +286,17 @@ export const compareByRestaurant = async (req: Request, res: Response) => {
     });
   }
 };
+
+/* =========================
+   COMPARE PRODUCT BY NAME (SEARCH)
+========================= */
+export const compareProductByName = async (req: Request, res: Response) => {
+  try {
+    const { product } = req.query;
+
+    if (!product || typeof product !== 'string') {
+      return res.status(400).json({ message: 'Product name is required' });
+    }
 
     // ✅ Correct column name is "name"
     const foundProduct = await Product.findOne({
