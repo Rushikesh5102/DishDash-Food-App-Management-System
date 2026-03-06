@@ -1,394 +1,363 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import Navbar from "@/components/Navbar";
-import { motion } from "framer-motion";
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/lib/authContext';
+import ProtectedRoute from '@/lib/ProtectedRoute';
+import { motion } from 'framer-motion';
 
 export default function SettingsPage() {
-  const [settings, setSettings] = useState({
-    notifications: true,
-    darkMode: false,
-    autoSave: true,
-    showTips: true,
-    currency: "INR",
+  const { user, updateProfile, logout } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState('');
+  const [error, setError] = useState('');
+
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    pincode: '',
   });
 
-  const [theme, setTheme] = useState("light");
-  const [savedSuccessfully, setSavedSuccessfully] = useState(false);
+  const [preferences, setPreferences] = useState({
+    notifications: true,
+    darkMode: false,
+    emailUpdates: true,
+    currency: 'INR',
+  });
 
   useEffect(() => {
-    const saved = localStorage.getItem("appSettings");
-    if (saved) {
-      const parsedSettings = JSON.parse(saved);
-      setSettings(parsedSettings);
-      setTheme(parsedSettings.darkMode ? "dark" : "light");
+    if (user) {
+      setFormData({
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        address: user.address || '',
+        city: user.city || '',
+        pincode: user.pincode || '',
+      });
     }
-  }, []);
 
-  const handleSettingChange = (key: string, value: any) => {
-    const updated = { ...settings, [key]: value };
-    setSettings(updated);
-    localStorage.setItem("appSettings", JSON.stringify(updated));
-
-    if (key === "darkMode") {
-      setTheme(value ? "dark" : "light");
+    const savedPreferences = localStorage.getItem('userPreferences');
+    if (savedPreferences) {
+      setPreferences(JSON.parse(savedPreferences));
     }
+  }, [user]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  const handleClearData = () => {
-    if (window.confirm("Are you sure? This will delete all saved orders and searches.")) {
-      localStorage.removeItem("savedOrders");
-      localStorage.removeItem("recentSearches");
-      localStorage.removeItem("appSettings");
-      window.location.reload();
-    }
+  const handlePreferenceChange = (key: string, value: boolean | string) => {
+    const updated = { ...preferences, [key]: value };
+    setPreferences(updated);
+    localStorage.setItem('userPreferences', JSON.stringify(updated));
   };
 
-  const handleExportData = () => {
-    const data = {
-      savedOrders: localStorage.getItem("savedOrders"),
-      recentSearches: localStorage.getItem("recentSearches"),
-      settings: localStorage.getItem("appSettings"),
-      exportedAt: new Date().toISOString(),
-    };
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    setSuccess('');
 
-    const dataStr = JSON.stringify(data, null, 2);
-    const dataBlob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `dishdash-backup-${Date.now()}.json`;
-    link.click();
+    try {
+      await updateProfile(formData);
+      setSuccess('Profile updated successfully!');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err: any) {
+      setError(err.message || 'Failed to update profile');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.1 },
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, x: -20 },
+    hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
-      x: 0,
-      transition: { duration: 0.5 },
+      y: 0,
+      transition: { duration: 0.4 },
     },
   };
 
   return (
-    <>
-      <Navbar />
-      <div className={`min-h-screen px-6 py-14 ${
-        theme === "dark"
-          ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white"
-          : "bg-gradient-to-br from-[#fff0f5] via-white to-[#ffe4e1] text-[#3b2f2f]"
-      }`}>
-        {/* HEADER */}
+    <ProtectedRoute>
+      <motion.div
+        className="min-h-screen bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50 p-4 md:p-8"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-4xl mx-auto mb-12"
+          className="mb-8"
         >
-          <h1 className={`text-5xl font-bold mb-2 ${
-            theme === "dark" ? "text-white" : "text-[#3b2f2f]"
-          }`}>
-            ⚙️ Settings
-          </h1>
-          <p className={theme === "dark" ? "text-gray-400" : "text-[#8b7b7b]"}>
-            Customize your DishDash experience
-          </p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">⚙️ Settings</h1>
+          <p className="text-gray-600">Manage your account and preferences</p>
         </motion.div>
 
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="max-w-4xl mx-auto space-y-6"
+          className="grid grid-cols-1 lg:grid-cols-3 gap-8"
         >
-          {/* NOTIFICATION SETTINGS */}
+          {/* Profile Section */}
           <motion.div
             variants={itemVariants}
-            className={`p-8 rounded-2xl border-2 ${
-              theme === "dark"
-                ? "bg-gray-800/50 border-blue-500/30"
-                : "bg-white/40 border-[#daa520]/20"
-            }`}
+            className="lg:col-span-2 bg-white rounded-xl shadow-lg p-8"
           >
-            <h2 className={`text-2xl font-bold mb-6 flex items-center gap-2 ${
-              theme === "dark" ? "text-white" : "text-[#3b2f2f]"
-            }`}>
-              🔔 Notifications
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+              👤 Profile Information
             </h2>
 
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
+            {success && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700"
+              >
+                ✓ {success}
+              </motion.div>
+            )}
+
+            {error && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700"
+              >
+                ✕ {error}
+              </motion.div>
+            )}
+
+            <form onSubmit={handleSaveProfile} className="space-y-4">
+              {/* Names Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p className={`font-semibold ${
-                    theme === "dark" ? "text-white" : "text-[#3b2f2f]"
-                  }`}>
-                    Push Notifications
-                  </p>
-                  <p className={theme === "dark" ? "text-gray-400 text-sm" : "text-[#8b7b7b] text-sm"}>
-                    Get notified when prices change
-                  </p>
-                </div>
-                <motion.button
-                  onClick={() => handleSettingChange("notifications", !settings.notifications)}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  className={`w-14 h-8 rounded-full transition-colors ${
-                    settings.notifications
-                      ? "bg-[#daa520]"
-                      : theme === "dark"
-                      ? "bg-gray-600"
-                      : "bg-gray-300"
-                  }`}
-                >
-                  <motion.div
-                    animate={{ x: settings.notifications ? 28 : 4 }}
-                    className="w-6 h-6 bg-white rounded-full"
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    First Name
+                  </label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
-                </motion.button>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Last Name
+                  </label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className={`font-semibold ${
-                    theme === "dark" ? "text-white" : "text-[#3b2f2f]"
-                  }`}>
-                    Show Tips & Tricks
-                  </p>
-                  <p className={theme === "dark" ? "text-gray-400 text-sm" : "text-[#8b7b7b] text-sm"}>
-                    Display helpful suggestions
-                  </p>
-                </div>
-                <motion.button
-                  onClick={() => handleSettingChange("showTips", !settings.showTips)}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  className={`w-14 h-8 rounded-full transition-colors ${
-                    settings.showTips
-                      ? "bg-[#daa520]"
-                      : theme === "dark"
-                      ? "bg-gray-600"
-                      : "bg-gray-300"
-                  }`}
-                >
-                  <motion.div
-                    animate={{ x: settings.showTips ? 28 : 4 }}
-                    className="w-6 h-6 bg-white rounded-full"
-                  />
-                </motion.button>
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  disabled
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
+                />
+                <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
               </div>
-            </div>
+
+              {/* Phone */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  placeholder="9876543210"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              {/* Address */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Street Address
+                </label>
+                <input
+                  type="text"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  placeholder="123 Main St"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              {/* City & Pincode */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    City
+                  </label>
+                  <input
+                    type="text"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleInputChange}
+                    placeholder="Pune"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Pincode
+                  </label>
+                  <input
+                    type="text"
+                    name="pincode"
+                    value={formData.pincode}
+                    onChange={handleInputChange}
+                    placeholder="411001"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+              </div>
+
+              {/* Save Button */}
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="submit"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-3 rounded-lg hover:shadow-lg transition disabled:opacity-50 mt-6"
+              >
+                {loading ? 'Saving...' : 'Save Changes'}
+              </motion.button>
+            </form>
           </motion.div>
 
-          {/* APPEARANCE SETTINGS */}
+          {/* Preferences Sidebar */}
           <motion.div
             variants={itemVariants}
-            className={`p-8 rounded-2xl border-2 ${
-              theme === "dark"
-                ? "bg-gray-800/50 border-purple-500/30"
-                : "bg-white/40 border-[#daa520]/20"
-            }`}
+            className="bg-white rounded-xl shadow-lg p-8 h-fit"
           >
-            <h2 className={`text-2xl font-bold mb-6 flex items-center gap-2 ${
-              theme === "dark" ? "text-white" : "text-[#3b2f2f]"
-            }`}>
-              🎨 Appearance
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">📋 Preferences</h2>
 
-            <div className="space-y-4">
+            <div className="space-y-4 mb-8">
+              {/* Notifications */}
               <div className="flex items-center justify-between">
                 <div>
-                  <p className={`font-semibold ${
-                    theme === "dark" ? "text-white" : "text-[#3b2f2f]"
-                  }`}>
-                    Dark Mode
-                  </p>
-                  <p className={theme === "dark" ? "text-gray-400 text-sm" : "text-[#8b7b7b] text-sm"}>
-                    Easy on the eyes for night time
-                  </p>
+                  <p className="font-semibold text-gray-900">Notifications</p>
+                  <p className="text-xs text-gray-600">Push notifications</p>
                 </div>
                 <motion.button
-                  onClick={() => handleSettingChange("darkMode", !settings.darkMode)}
                   whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  className={`w-14 h-8 rounded-full transition-colors ${
-                    settings.darkMode
-                      ? "bg-[#daa520]"
-                      : theme === "dark"
-                      ? "bg-gray-600"
-                      : "bg-gray-300"
+                  onClick={() =>
+                    handlePreferenceChange('notifications', !preferences.notifications)
+                  }
+                  className={`w-12 h-6 rounded-full transition ${
+                    preferences.notifications
+                      ? 'bg-indigo-600'
+                      : 'bg-gray-300'
                   }`}
                 >
-                  <motion.div
-                    animate={{ x: settings.darkMode ? 28 : 4 }}
-                    className="w-6 h-6 bg-white rounded-full"
-                  />
+                  <div
+                    className={`w-5 h-5 bg-white rounded-full transition transform ${
+                      preferences.notifications ? 'translate-x-6' : 'translate-x-0.5'
+                    }`}
+                  ></div>
                 </motion.button>
               </div>
 
-              <div>
-                <p className={`font-semibold mb-3 ${
-                  theme === "dark" ? "text-white" : "text-[#3b2f2f]"
-                }`}>
-                  Currency
-                </p>
-                <select
-                  value={settings.currency}
-                  onChange={(e) => handleSettingChange("currency", e.target.value)}
-                  className={`w-full px-4 py-2 rounded-lg ${
-                    theme === "dark"
-                      ? "bg-gray-700 border-gray-600 text-white"
-                      : "bg-white/30 border-[#daa520]/20 text-[#3b2f2f]"
-                  } border`}
+              {/* Email Updates */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold text-gray-900">Email Updates</p>
+                  <p className="text-xs text-gray-600">Promotional emails</p>
+                </div>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  onClick={() =>
+                    handlePreferenceChange('emailUpdates', !preferences.emailUpdates)
+                  }
+                  className={`w-12 h-6 rounded-full transition ${
+                    preferences.emailUpdates
+                      ? 'bg-indigo-600'
+                      : 'bg-gray-300'
+                  }`}
                 >
-                  <option value="INR">₹ Indian Rupee (INR)</option>
-                  <option value="USD">$ US Dollar (USD)</option>
-                  <option value="EUR">€ Euro (EUR)</option>
+                  <div
+                    className={`w-5 h-5 bg-white rounded-full transition transform ${
+                      preferences.emailUpdates ? 'translate-x-6' : 'translate-x-0.5'
+                    }`}
+                  ></div>
+                </motion.button>
+              </div>
+
+              {/* Currency */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  💰 Currency
+                </label>
+                <select
+                  value={preferences.currency}
+                  onChange={(e) =>
+                    handlePreferenceChange('currency', e.target.value)
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="INR">₹ INR (India)</option>
+                  <option value="USD">$ USD (USA)</option>
+                  <option value="EUR">€ EUR (Europe)</option>
                 </select>
               </div>
             </div>
-          </motion.div>
 
-          {/* DATA SETTINGS */}
-          <motion.div
-            variants={itemVariants}
-            className={`p-8 rounded-2xl border-2 ${
-              theme === "dark"
-                ? "bg-gray-800/50 border-green-500/30"
-                : "bg-white/40 border-[#daa520]/20"
-            }`}
-          >
-            <h2 className={`text-2xl font-bold mb-6 flex items-center gap-2 ${
-              theme === "dark" ? "text-white" : "text-[#3b2f2f]"
-            }`}>
-              💾 Data Management
-            </h2>
-
-            <div className="space-y-3">
+            {/* Account Actions */}
+            <div className="border-t border-gray-200 pt-6">
               <motion.button
-                onClick={handleExportData}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className={`w-full px-6 py-3 rounded-xl font-semibold transition-all ${
-                  theme === "dark"
-                    ? "bg-green-600/30 border border-green-600/50 text-green-400 hover:bg-green-600/50"
-                    : "bg-green-400/20 border border-green-400/50 text-green-600 hover:bg-green-400/30"
-                }`}
+                onClick={logout}
+                className="w-full bg-red-50 text-red-600 font-semibold py-2 rounded-lg hover:bg-red-100 transition"
               >
-                📥 Export Data as JSON
+                🚪 Logout
               </motion.button>
-
-              <motion.button
-                onClick={handleClearData}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className={`w-full px-6 py-3 rounded-xl font-semibold transition-all ${
-                  theme === "dark"
-                    ? "bg-red-600/30 border border-red-600/50 text-red-400 hover:bg-red-600/50"
-                    : "bg-red-400/20 border border-red-400/50 text-red-600 hover:bg-red-400/30"
-                }`}
-              >
-                🗑️ Clear All Data
-              </motion.button>
-            </div>
-          </motion.div>
-
-          {/* DATA STORAGE */}
-          <motion.div
-            variants={itemVariants}
-            className={`p-8 rounded-2xl border-2 ${
-              theme === "dark"
-                ? "bg-gray-800/50 border-yellow-500/30"
-                : "bg-white/40 border-[#daa520]/20"
-            }`}
-          >
-            <h2 className={`text-2xl font-bold mb-4 flex items-center gap-2 ${
-              theme === "dark" ? "text-white" : "text-[#3b2f2f]"
-            }`}>
-              📊 Storage Statistics
-            </h2>
-
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className={`p-4 rounded-lg ${
-                theme === "dark" ? "bg-gray-700/50" : "bg-white/30"
-              }`}>
-                <p className={theme === "dark" ? "text-gray-400 text-sm" : "text-[#8b7b7b] text-sm"}>
-                  Saved Orders
-                </p>
-                <p className={`text-2xl font-bold ${
-                  theme === "dark" ? "text-blue-400" : "text-blue-600"
-                }`}>
-                  {localStorage.getItem("savedOrders")
-                    ? JSON.parse(localStorage.getItem("savedOrders") || "[]").length
-                    : 0}
-                </p>
-              </div>
-
-              <div className={`p-4 rounded-lg ${
-                theme === "dark" ? "bg-gray-700/50" : "bg-white/30"
-              }`}>
-                <p className={theme === "dark" ? "text-gray-400 text-sm" : "text-[#8b7b7b] text-sm"}>
-                  Recent Searches
-                </p>
-                <p className={`text-2xl font-bold ${
-                  theme === "dark" ? "text-green-400" : "text-green-600"
-                }`}>
-                  {localStorage.getItem("recentSearches")
-                    ? JSON.parse(localStorage.getItem("recentSearches") || "[]").length
-                    : 0}
-                </p>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* ABOUT */}
-          <motion.div
-            variants={itemVariants}
-            className={`p-8 rounded-2xl border-2 ${
-              theme === "dark"
-                ? "bg-gray-800/50 border-indigo-500/30"
-                : "bg-white/40 border-[#daa520]/20"
-            }`}
-          >
-            <h2 className={`text-2xl font-bold mb-4 flex items-center gap-2 ${
-              theme === "dark" ? "text-white" : "text-[#3b2f2f]"
-            }`}>
-              ℹ️ About DishDash
-            </h2>
-
-            <div className={theme === "dark" ? "text-gray-300 space-y-2" : "text-[#8b7b7b] space-y-2"}>
-              <p className="font-semibold">Version 1.0.0</p>
-              <p>© 2026 DishDash • Smart Food Price Comparison</p>
-              <p className="text-sm">
-                Made with ❤️ to help you save money on food delivery
-              </p>
             </div>
           </motion.div>
         </motion.div>
-
-        {savedSuccessfully && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            className="fixed bottom-6 right-6 px-6 py-3 rounded-xl bg-green-500 text-white font-semibold"
-          >
-            ✅ Settings saved successfully!
-          </motion.div>
-        )}
-
-        <footer className={`mt-24 text-center text-sm ${
-          theme === "dark" ? "text-gray-500" : "text-[#b8a8a8]"
-        }`}>
-          © 2026 DishDash • Smart ordering, Smarter savings
-        </footer>
-      </div>
-    </>
+      </motion.div>
+    </ProtectedRoute>
   );
 }

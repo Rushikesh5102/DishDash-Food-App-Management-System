@@ -1,271 +1,236 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import Navbar from "@/components/Navbar";
-import { searchAndCompareProduct } from "@/lib/api";
-import { motion } from "framer-motion";
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/lib/authContext';
+import ProtectedRoute from '@/lib/ProtectedRoute';
+import { motion } from 'framer-motion';
+
+interface Order {
+  id: number;
+  productId: number;
+  platformId: number;
+  restaurantId: number;
+  price: number;
+  deliveryFee: number;
+  totalPrice: number;
+  discount: number;
+  status: string;
+  createdAt: string;
+}
 
 export default function OrdersPage() {
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [sortBy, setSortBy] = useState("cheapest");
-  const [savedOrders, setSavedOrders] = useState<any[]>([]);
-  const [viewMode, setViewMode] = useState<"search" | "saved">("search");
-
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const { user } = useAuth();
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [filter, setFilter] = useState('all');
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
-    const stored = localStorage.getItem("recentSearches");
-    if (stored) setRecentSearches(JSON.parse(stored));
-    
-    const saved = localStorage.getItem("savedOrders");
-    if (saved) setSavedOrders(JSON.parse(saved));
-  }, []);
+    fetchOrders();
+  }, [filter, page]);
 
-  const popularItems = [
-    "Chicken Biryani",
-    "Veg Burger",
-    "Margherita Pizza",
-    "Salmon Sushi Roll",
-    "Paneer Butter Masala",
-  ];
-
-  useEffect(() => {
-    if (query.length > 0) {
-      const filtered = popularItems.filter((item) =>
-        item.toLowerCase().includes(query.toLowerCase())
-      );
-      setSuggestions(filtered);
-    } else {
-      setSuggestions([]);
-    }
-  }, [query]);
-
-  const handleSearch = async (searchTerm?: string) => {
-    const finalQuery = searchTerm || query;
-    if (!finalQuery.trim()) return;
-
-    setLoading(true);
-    setError("");
-    setResults(null);
-    setSuggestions([]);
-
+  const fetchOrders = async () => {
     try {
-      const data = await searchAndCompareProduct(finalQuery);
-      setResults(data);
+      setLoading(true);
+      const token = localStorage.getItem('authToken');
+      const query = filter !== 'all' ? `?status=${filter}&page=${page}` : `?page=${page}`;
 
-      const updatedRecent = [
-        finalQuery,
-        ...recentSearches.filter((r) => r !== finalQuery),
-      ].slice(0, 5);
-
-      setRecentSearches(updatedRecent);
-      localStorage.setItem(
-        "recentSearches",
-        JSON.stringify(updatedRecent)
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/orders/user/history${query}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
+
+      if (response.ok) {
+        const data = await response.json();
+        setOrders(data.data || []);
+      }
     } catch (err: any) {
-      setError(err.message || "Error fetching results");
-      console.error("Search error:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
-  const saveOrder = (item: any) => {
-    const newOrder = {
-      ...item,
-      savedAt: new Date().toISOString(),
-    };
-    const updated = [newOrder, ...savedOrders];
-    setSavedOrders(updated);
-    localStorage.setItem("savedOrders", JSON.stringify(updated));
-  };
-
-  const removeOrder = (index: number) => {
-    const updated = savedOrders.filter((_, i) => i !== index);
-    setSavedOrders(updated);
-    localStorage.setItem("savedOrders", JSON.stringify(updated));
+  const statusColorMap: Record<string, string> = {
+    pending: 'bg-yellow-100 text-yellow-800',
+    confirmed: 'bg-blue-100 text-blue-800',
+    delivered: 'bg-green-100 text-green-800',
+    cancelled: 'bg-red-100 text-red-800',
   };
 
   return (
-    <>
-      <Navbar />
+    <ProtectedRoute>
+      <motion.div
+        className="min-h-screen bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50 p-4 md:p-8"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">My Orders</h1>
+          <p className="text-gray-600">Track all your food orders</p>
+        </motion.div>
 
-      <div className="min-h-screen bg-gradient-to-br from-[#fff0f5] via-white to-[#ffe4e1] text-[#3b2f2f] px-6 py-14">
-
-        {/* HERO */}
-        <div className="max-w-4xl mx-auto text-center mb-14 relative">
-          <h1 className="text-5xl font-bold tracking-tight mb-4 text-[#3b2f2f]">
-            Smart Food Price Comparison
-          </h1>
-          <p className="text-[#8b7b7b] text-lg">
-            Compare Swiggy, Zomato, Eatsure, Maginpin & Dunzo instantly.
-          </p>
-
-          {/* SEARCH */}
-          <div className="mt-8 relative max-w-xl mx-auto">
-            <input
-              type="text"
-              placeholder="Search Chicken Biryani..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              className="w-full px-5 py-4 rounded-xl bg-white/40 border border-[#daa520]/30 focus:ring-2 focus:ring-[#daa520] outline-none text-[#3b2f2f]"
-            />
-
-            {/* AUTOCOMPLETE DROPDOWN */}
-            {(suggestions.length > 0 ||
-              (query.length === 0 && recentSearches.length > 0)) && (
-              <div className="absolute w-full mt-2 bg-white border border-[#daa520]/20 rounded-xl shadow-xl text-left z-50">
-                {query.length === 0 && recentSearches.length > 0 && (
-                  <div className="p-3 text-xs text-[#8b7b7b] border-b border-[#daa520]/10">
-                    Recent Searches
-                  </div>
-                )}
-
-                {(query.length > 0
-                  ? suggestions
-                  : recentSearches
-                ).map((item, index) => (
-                  <div
-                    key={index}
-                    onClick={() => {
-                      setQuery(item);
-                      handleSearch(item);
-                    }}
-                    className="px-4 py-3 hover:bg-[#ffb6d9]/20 cursor-pointer transition-all text-sm text-[#3b2f2f]"
-                  >
-                    {item}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <button
-              onClick={() => handleSearch()}
-              className="mt-4 w-full bg-[#daa520] hover:bg-[#b8860b] py-3 rounded-xl font-semibold transition-all text-[#3b2f2f]"
+        {/* Filters */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-wrap gap-3 mb-8"
+        >
+          {['all', 'pending', 'confirmed', 'delivered', 'cancelled'].map((status) => (
+            <motion.button
+              key={status}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                setFilter(status);
+                setPage(1);
+              }}
+              className={`px-4 py-2 rounded-full font-semibold transition ${
+                filter === status
+                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:border-indigo-600'
+              }`}
             >
-              {loading ? "Comparing..." : "Compare Prices"}
-            </button>
-          </div>
+              {status.charAt(0).toUpperCase() + status.slice(1)}
+            </motion.button>
+          ))}
+        </motion.div>
 
-          {error && <p className="mt-4 text-red-600 font-semibold">{error}</p>}
-        </div>
-
-        {/* LOADING */}
-        {loading && (
-          <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 animate-pulse">
-            {[1, 2, 3].map((_, i) => (
-              <div
-                key={i}
-                className="bg-white/30 border border-[#daa520]/20 p-8 rounded-2xl h-60"
-              ></div>
-            ))}
-          </div>
-        )}
-
-        {/* RESULTS */}
-        {results && results.comparisons?.length > 0 && (
-          <div className="max-w-6xl mx-auto">
-            <div className="flex justify-end mb-6">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="bg-white/30 border border-[#daa520]/20 rounded-lg px-4 py-2 text-sm text-[#3b2f2f]"
-              >
-                <option value="cheapest">Sort by Cheapest</option>
-                <option value="fastest">Sort by Fastest</option>
-              </select>
+        {/* Orders List */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="space-y-4"
+        >
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
             </div>
-
-            {(() => {
-              let processed = [...results.comparisons];
-
-              if (sortBy === "cheapest") {
-                processed.sort(
-                  (a: any, b: any) =>
-                    a.finalPrice - b.finalPrice
-                );
-              } else {
-                processed.sort(
-                  (a: any, b: any) =>
-                    a.etaMinutes - b.etaMinutes
-                );
-              }
-
-              return (
-                <div className="grid md:grid-cols-2 gap-8">
-                  {processed.map((item: any, index: number) => (
-                    <div
-                      key={index}
-                      className="p-8 rounded-2xl border bg-white/40 border-[#daa520]/20 hover:scale-[1.03] transition-all overflow-hidden"
-                    >
-                      {item.productImage && (
-                        <img
-                          src={item.productImage}
-                          alt={item.productName}
-                          className="w-full h-48 object-cover rounded-xl mb-4"
-                        />
-                      )}
-                      <h2 className="text-2xl font-bold text-[#3b2f2f] mb-3">
-                        {item.productName}
-                      </h2>
-                      <div className="flex items-center gap-3 mb-4">
-                        <img
-                          src={`https://logo.clearbit.com/${item.platform
-                            .toLowerCase()
-                            .replace(" ", "")}.com`}
-                          className="w-8 h-8 rounded"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src =
-                              'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect fill="%23daa520" width="100" height="100"/%3E%3C/svg%3E';
-                          }}
-                        />
-                        <h3 className="text-xl font-semibold text-[#3b2f2f]">
-                          {item.platform}
+          ) : error ? (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+              {error}
+            </div>
+          ) : orders.length > 0 ? (
+            orders.map((order, index) => (
+              <motion.div
+                key={order.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition border border-gray-200"
+              >
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-4 mb-3">
+                      <div className="text-3xl">🍽️</div>
+                      <div>
+                        <h3 className="text-lg font-bold text-gray-900">
+                          Order #{order.id}
                         </h3>
+                        <p className="text-sm text-gray-600">
+                          {new Date(order.createdAt).toLocaleDateString('en-US', {
+                            weekday: 'short',
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </p>
                       </div>
-
-                      <p className="text-[#8b7b7b] text-sm mb-2">
-                        ETA: {item.etaMinutes} mins
-                      </p>
-
-                      <div className="mt-4 text-3xl font-bold text-[#daa520]">
-                        ₹{item.finalPrice}
-                      </div>
-
-                      <button
-                        onClick={() =>
-                          window.open(
-                            item.redirectUrl,
-                            "_blank"
-                          )
-                        }
-                        className="mt-6 w-full py-3 rounded-xl font-semibold bg-[#daa520] hover:bg-[#b8860b] text-[#3b2f2f] transition-all"
-                      >
-                        Order Now
-                      </button>
                     </div>
-                  ))}
+                  </div>
+
+                  <div className="flex flex-col items-start md:items-end gap-3">
+                    <div>
+                      <p className="text-2xl font-bold text-gray-900">
+                        ₹{order.totalPrice}
+                      </p>
+                      {order.discount > 0 && (
+                        <p className="text-sm text-green-600 font-semibold">
+                          Saved ₹{order.discount}
+                        </p>
+                      )}
+                    </div>
+                    <motion.span
+                      whileHover={{ scale: 1.05 }}
+                      className={`text-xs font-semibold px-4 py-2 rounded-full ${
+                        statusColorMap[order.status] ||
+                        'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      {order.status.charAt(0).toUpperCase() +
+                        order.status.slice(1)}
+                    </motion.span>
+                  </div>
                 </div>
-              );
-            })()}
-          </div>
-        )}
 
-        {!results && !loading && (
-          <div className="text-center text-[#8b7b7b] mt-24">
-            🍽️ Search a dish to start comparing
-          </div>
-        )}
-
-        <footer className="mt-24 text-center text-[#b8a8a8] text-sm">
-          © 2026 DishDash • Compare smarter, order better
-        </footer>
-      </div>
-    </>
+                <div className="mt-4 pt-4 border-t border-gray-200 grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div>
+                    <p className="text-xs text-gray-600 font-semibold">
+                      ITEM PRICE
+                    </p>
+                    <p className="text-sm font-bold text-gray-900">
+                      ₹{order.price}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-600 font-semibold">
+                      DELIVERY FEE
+                    </p>
+                    <p className="text-sm font-bold text-gray-900">
+                      ₹{order.deliveryFee}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-600 font-semibold">
+                      DISCOUNT
+                    </p>
+                    <p className="text-sm font-bold text-green-600">
+                      -₹{order.discount}
+                    </p>
+                  </div>
+                  <div>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-indigo-700 transition w-full"
+                    >
+                      Rate Order
+                    </motion.button>
+                  </div>
+                </div>
+              </motion.div>
+            ))
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-white rounded-xl shadow-md p-12 text-center"
+            >
+              <p className="text-3xl mb-4">🛒</p>
+              <p className="text-gray-600 text-lg mb-6">No orders found</p>
+              <motion.a
+                whileHover={{ scale: 1.05 }}
+                href="/search"
+                className="inline-block bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition"
+              >
+                Order Now
+              </motion.a>
+            </motion.div>
+          )}
+        </motion.div>
+      </motion.div>
+    </ProtectedRoute>
   );
 }

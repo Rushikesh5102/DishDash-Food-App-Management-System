@@ -1,78 +1,60 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import Navbar from "@/components/Navbar";
-import { motion } from "framer-motion";
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/lib/authContext';
+import ProtectedRoute from '@/lib/ProtectedRoute';
+import { motion } from 'framer-motion';
+
+interface OrderStats {
+  totalSpent: number;
+  totalSaved: number;
+  totalOrders: number;
+  byStatus: Record<string, number>;
+}
 
 export default function AnalyticsPage() {
-  const [savedOrders, setSavedOrders] = useState<any[]>([]);
-  const [stats, setStats] = useState({
-    totalOrdersCompared: 0,
-    totalSavings: 0,
-    averageDiscountRate: 0,
-    mostUsedPlatform: "",
-    cheapestPlatform: "",
-  });
+  const { user } = useAuth();
+  const [stats, setStats] = useState<OrderStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const saved = localStorage.getItem("savedOrders");
-    const recent = localStorage.getItem("recentSearches");
-
-    if (saved) {
-      const orders = JSON.parse(saved);
-      setSavedOrders(orders);
-      calculateStats(orders, recent ? JSON.parse(recent) : []);
-    }
+    fetchAnalytics();
   }, []);
 
-  const calculateStats = (orders: any[], searches: any[]) => {
-    let totalSavings = 0;
-    let platformUsage: Record<string, number> = {};
-    let platformCheapest: Record<string, number> = {};
-    let totalDiscounts = 0;
-    let discountCount = 0;
+  const fetchAnalytics = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('authToken');
 
-    orders.forEach((order) => {
-      const maxPrice = Math.max(
-        ...order.comparisons.map((c: any) => c.finalPrice)
-      );
-      const savings = maxPrice - order.cheapest.finalPrice;
-      totalSavings += savings;
-
-      order.comparisons.forEach((c: any) => {
-        platformUsage[c.platform] = (platformUsage[c.platform] || 0) + 1;
-        if (c.discount > 0) {
-          totalDiscounts += c.discount;
-          discountCount++;
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/orders/user/stats`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
+      );
 
-      platformCheapest[order.cheapest.platform] =
-        (platformCheapest[order.cheapest.platform] || 0) + 1;
-    });
-
-    const mostUsedPlatform =
-      Object.entries(platformUsage).sort((a, b) => b[1] - a[1])[0]?.[0] ||
-      "N/A";
-    const cheapestPlatform =
-      Object.entries(platformCheapest).sort((a, b) => b[1] - a[1])[0]?.[0] ||
-      "N/A";
-
-    setStats({
-      totalOrdersCompared: searches.length,
-      totalSavings,
-      averageDiscountRate:
-        discountCount > 0 ? (totalDiscounts / discountCount).toFixed(2) : 0,
-      mostUsedPlatform,
-      cheapestPlatform,
-    });
+      if (response.ok) {
+        const data = await response.json();
+        setStats(data.data);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.1 },
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
     },
   };
 
@@ -81,207 +63,250 @@ export default function AnalyticsPage() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5 },
+      transition: { duration: 0.4 },
     },
   };
 
   return (
-    <>
-      <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-[#fff0f5] via-white to-[#ffe4e1] text-[#3b2f2f] px-6 py-14">
-        {/* HEADER */}
+    <ProtectedRoute>
+      <motion.div
+        className="min-h-screen bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50 p-4 md:p-8"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-6xl mx-auto mb-12"
+          className="mb-8"
         >
-          <h1 className="text-5xl font-bold text-[#3b2f2f] mb-2">
-            📊 Analytics Dashboard
-          </h1>
-          <p className="text-[#8b7b7b] text-lg">
-            Track your ordering habits and savings with detailed analytics
-          </p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">📊 Analytics</h1>
+          <p className="text-gray-600">Your spending and savings overview</p>
         </motion.div>
 
-        {savedOrders.length > 0 ? (
-          <>
-            {/* STATS GRID */}
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          </div>
+        ) : error ? (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+            {error}
+          </div>
+        ) : stats ? (
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="space-y-8"
+          >
+            {/* Key Metrics */}
             <motion.div
-              variants={containerVariants}
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: {
+                    staggerChildren: 0.1,
+                  },
+                },
+              }}
               initial="hidden"
               animate="visible"
-              className="max-w-6xl mx-auto grid md:grid-cols-3 gap-6 mb-12"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
             >
-              {/* Total Searches */}
+              {/* Total Orders */}
               <motion.div
                 variants={itemVariants}
-                whileHover={{ scale: 1.05 }}
-                className="p-8 rounded-2xl bg-gradient-to-br from-blue-400/20 to-blue-500/20 border-2 border-blue-400/50"
+                className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-indigo-600"
               >
-                <p className="text-blue-600 font-semibold text-sm">📝 Searches Compared</p>
-                <p className="text-5xl font-bold text-blue-600 mt-3">
-                  {stats.totalOrdersCompared}
+                <p className="text-gray-600 text-sm font-semibold">Total Orders</p>
+                <p className="text-4xl font-bold text-gray-900 mt-2">
+                  {stats.totalOrders}
                 </p>
-                <p className="text-blue-600/70 text-sm mt-2">
-                  Total price comparisons made
+                <p className="text-xs text-gray-500 mt-2">
+                  {Math.round(stats.totalOrders / 30)} orders per month
                 </p>
               </motion.div>
 
-              {/* Total Savings */}
+              {/* Total Spent */}
               <motion.div
                 variants={itemVariants}
-                whileHover={{ scale: 1.05 }}
-                className="p-8 rounded-2xl bg-gradient-to-br from-green-400/20 to-green-500/20 border-2 border-green-400/50"
+                className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white"
               >
-                <p className="text-green-600 font-semibold text-sm">💰 Total Savings</p>
-                <p className="text-5xl font-bold text-green-600 mt-3">
-                  ₹{stats.totalSavings.toFixed(2)}
-                </p>
-                <p className="text-green-600/70 text-sm mt-2">
-                  By choosing cheapest options
+                <p className="text-sm font-semibold opacity-90">Total Spent</p>
+                <p className="text-4xl font-bold mt-2">₹{stats.totalSpent}</p>
+                <p className="text-xs opacity-75 mt-2">
+                  ₹{Math.round(stats.totalSpent / stats.totalOrders)}/order avg
                 </p>
               </motion.div>
 
-              {/* Avg Discount */}
+              {/* Total Saved */}
               <motion.div
                 variants={itemVariants}
-                whileHover={{ scale: 1.05 }}
-                className="p-8 rounded-2xl bg-gradient-to-br from-[#daa520]/20 to-[#ffb6d9]/20 border-2 border-[#daa520]/50"
+                className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white"
               >
-                <p className="font-semibold text-sm text-[#daa520]">🎁 Avg Discount</p>
-                <p className="text-5xl font-bold text-[#daa520] mt-3">
-                  ₹{stats.averageDiscountRate}
+                <p className="text-sm font-semibold opacity-90">Total Saved</p>
+                <p className="text-4xl font-bold mt-2">₹{stats.totalSaved}</p>
+                <p className="text-xs opacity-75 mt-2">
+                  {stats.totalSpent > 0
+                    ? ((stats.totalSaved / stats.totalSpent) * 100).toFixed(1)
+                    : 0}
+                  % of spending
                 </p>
-                <p className="text-[#daa520]/70 text-sm mt-2">
-                  Per platform average
+              </motion.div>
+
+              {/* Savings Rate */}
+              <motion.div
+                variants={itemVariants}
+                className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white"
+              >
+                <p className="text-sm font-semibold opacity-90">Average Savings</p>
+                <p className="text-4xl font-bold mt-2">
+                  {stats.totalOrders > 0
+                    ? (stats.totalSaved / stats.totalOrders).toFixed(0)
+                    : 0}
+                  ₹
                 </p>
+                <p className="text-xs opacity-75 mt-2">Per order saved</p>
               </motion.div>
             </motion.div>
 
-            {/* PLATFORM INSIGHTS */}
+            {/* Charts & Status Distribution */}
             <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 mb-12"
+              variants={itemVariants}
+              className="grid grid-cols-1 lg:grid-cols-2 gap-8"
             >
-              {/* Most Used */}
-              <motion.div
-                variants={itemVariants}
-                className="p-8 rounded-2xl bg-white/40 border-2 border-[#daa520]/20"
-              >
-                <h3 className="text-2xl font-bold text-[#3b2f2f] mb-6">
-                  🏆 Most Frequently Cheapest
-                </h3>
-                <div className="text-6xl font-bold text-[#daa520]">
-                  {stats.cheapestPlatform}
-                </div>
-                <p className="text-[#8b7b7b] mt-3">
-                  Usually offers the best prices for your orders
-                </p>
-              </motion.div>
-
-              {/* Platform Breakdown */}
-              <motion.div
-                variants={itemVariants}
-                className="p-8 rounded-2xl bg-white/40 border-2 border-[#daa520]/20"
-              >
-                <h3 className="text-2xl font-bold text-[#3b2f2f] mb-6">
-                  📍 All Platforms
-                </h3>
-                <div className="space-y-3">
-                  {["Swiggy", "Zomato", "Eatsure", "Maginpin", "Dunzo"].map((platform) => (
+              {/* Order Status Distribution */}
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-6">
+                  Order Status Distribution
+                </h2>
+                <div className="space-y-4">
+                  {Object.entries(stats.byStatus || {}).map(([status, count], index) => (
                     <motion.div
-                      key={platform}
-                      whileHover={{ scale: 1.02 }}
-                      className="flex items-center gap-3 p-3 rounded-lg bg-white/20"
+                      key={status}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
                     >
-                      <div className="w-3 h-3 rounded-full bg-[#daa520]"></div>
-                      <span className="font-semibold text-[#3b2f2f]">{platform}</span>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-gray-700 font-semibold capitalize">
+                          {status}
+                        </span>
+                        <span className="text-gray-600 font-bold">{count}</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{
+                            width: `${
+                              stats.totalOrders > 0
+                                ? (count / stats.totalOrders) * 100
+                                : 0
+                            }%`,
+                          }}
+                          transition={{ delay: 0.5 + index * 0.1, duration: 0.6 }}
+                          className={`h-full ${
+                            status === 'delivered'
+                              ? 'bg-green-500'
+                              : status === 'pending'
+                              ? 'bg-yellow-500'
+                              : status === 'confirmed'
+                              ? 'bg-blue-500'
+                              : 'bg-red-500'
+                          }`}
+                        ></motion.div>
+                      </div>
                     </motion.div>
                   ))}
                 </div>
-              </motion.div>
-            </motion.div>
+              </div>
 
-            {/* SAVED ORDERS BREAKDOWN */}
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="max-w-6xl mx-auto"
-            >
-              <h2 className="text-3xl font-bold text-[#3b2f2f] mb-6">
-                📋 Recent Comparisons
-              </h2>
-              <div className="space-y-4">
-                {savedOrders.slice(0, 5).map((order, idx) => (
+              {/* Spending Summary */}
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-6">
+                  💰 Spending Summary
+                </h2>
+                <div className="space-y-6">
                   <motion.div
-                    key={idx}
-                    variants={itemVariants}
-                    whileHover={{ scale: 1.01 }}
-                    className="p-6 rounded-2xl bg-white/40 border border-[#daa520]/20"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200"
                   >
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="text-xl font-bold text-[#3b2f2f]">
-                          {order.product}
-                        </h3>
-                        <p className="text-sm text-[#8b7b7b]">
-                          📅 {new Date(order.savedAt).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-2xl font-bold text-green-600">
-                          ₹{(Math.max(...order.comparisons.map((c: any) => c.finalPrice)) -
-                            order.cheapest.finalPrice).toFixed(2)}
-                        </p>
-                        <p className="text-xs text-green-600/70">Saved</p>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-5 gap-3">
-                      {order.comparisons.map((item: any, i: number) => (
-                        <motion.div
-                          key={i}
-                          whileHover={{ scale: 1.05 }}
-                          className={`p-3 rounded-lg text-center ${
-                            item.platform === order.cheapest.platform
-                              ? "bg-green-400/30 border-2 border-green-400"
-                              : "bg-white/20"
-                          }`}
-                        >
-                          <p className="text-xs font-semibold text-[#8b7b7b]">
-                            {item.platform}
-                          </p>
-                          <p className="text-lg font-bold text-[#daa520] mt-1">
-                            ₹{item.finalPrice}
-                          </p>
-                        </motion.div>
-                      ))}
-                    </div>
+                    <p className="text-gray-700 text-sm font-semibold mb-1">
+                      Current Month Spending
+                    </p>
+                    <p className="text-2xl font-bold text-blue-600">
+                      ₹{stats.totalSpent}
+                    </p>
                   </motion.div>
-                ))}
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg border border-green-200"
+                  >
+                    <p className="text-gray-700 text-sm font-semibold mb-1">
+                      Current Month Savings
+                    </p>
+                    <p className="text-2xl font-bold text-green-600">
+                      ₹{stats.totalSaved}
+                    </p>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg border border-purple-200"
+                  >
+                    <p className="text-gray-700 text-sm font-semibold mb-1">
+                      Next Goal
+                    </p>
+                    <p className="text-2xl font-bold text-purple-600">
+                      Save ₹500 more
+                    </p>
+                  </motion.div>
+                </div>
               </div>
             </motion.div>
-          </>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center mt-24"
-          >
-            <p className="text-6xl mb-4">📊</p>
-            <p className="text-xl text-[#8b7b7b]">
-              No data yet. Start comparing orders to see analytics!
-            </p>
-          </motion.div>
-        )}
 
-        <footer className="mt-24 text-center text-[#b8a8a8] text-sm">
-          © 2026 DishDash • Smart ordering, Smarter savings
-        </footer>
-      </div>
-    </>
+            {/* Pro Tips */}
+            <motion.div
+              variants={itemVariants}
+              className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl shadow-lg p-6 border border-yellow-200"
+            >
+              <h2 className="text-xl font-bold text-gray-900 mb-4">💡 Money-Saving Tips</h2>
+              <ul className="space-y-3 text-gray-700">
+                <li className="flex items-start gap-3">
+                  <span className="text-xl mt-1">🎯</span>
+                  <span>
+                    Compare prices before ordering. You could save up to ₹
+                    {stats.totalOrders > 0
+                      ? (stats.totalSaved / stats.totalOrders).toFixed(0)
+                      : 0}{' '}
+                    per order!
+                  </span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-xl mt-1">⭐</span>
+                  <span>
+                    Use promo codes during peak hours to maximize savings
+                  </span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-xl mt-1">📱</span>
+                  <span>
+                    Check notifications for exclusive deals and limited-time offers
+                  </span>
+                </li>
+              </ul>
+            </motion.div>
+          </motion.div>
+        ) : null}
+      </motion.div>
+    </ProtectedRoute>
   );
 }

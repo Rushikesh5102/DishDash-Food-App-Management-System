@@ -1,8 +1,9 @@
-"use client";
+'use client';
 
-import "./globals.css";
-import Sidebar from "./components/Sidebar";
-import { Toaster } from "react-hot-toast";
+import './globals.css';
+import { AuthProvider } from '@/lib/authContext';
+import Header from '@/components/Header';
+import { Toaster } from 'react-hot-toast';
 
 export default function RootLayout({
   children,
@@ -11,12 +12,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-[#fff0f5] text-[#3b2f2f]">
-        <Toaster position="top-right" />
-        <div className="flex min-h-screen">
-          <Sidebar />
-          <main className="flex-1 p-8">{children}</main>
-        </div>
+      <body className="bg-white text-gray-900">
+        <AuthProvider>
+          <Toaster position="top-right" />
+          <Header />
+          <main className="min-h-screen">{children}</main>
+        </AuthProvider>
       </body>
     </html>
   );

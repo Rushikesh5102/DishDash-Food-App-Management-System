@@ -1,30 +1,295 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/lib/authContext';
+import ProtectedRoute from '@/lib/ProtectedRoute';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
 
-export default function Dashboard() {
-  const stats = [
-    { title: "Total Orders", value: 120 },
-    { title: "Revenue", value: "₹45,000" },
-    { title: "Pending Orders", value: 12 },
-  ];
+interface OrderStats {
+  totalSpent: number;
+  totalSaved: number;
+  totalOrders: number;
+  byStatus: Record<string, number>;
+}
+
+interface RecentOrder {
+  id: number;
+  productId: number;
+  restaurantId: number;
+  price: number;
+  deliveryFee: number;
+  totalPrice: number;
+  discount: number;
+  status: string;
+  createdAt: string;
+}
+
+export default function DashboardPage() {
+  const { user } = useAuth();
+  const [stats, setStats] = useState<OrderStats | null>(null);
+  const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      const token = localStorage.getItem('authToken');
+
+      // Fetch order stats
+      const statsResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/orders/user/stats`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (statsResponse.ok) {
+        const statsData = await statsResponse.json();
+        setStats(statsData.data);
+      }
+
+      // Fetch recent orders
+      const ordersResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/orders/user/history?limit=5`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (ordersResponse.ok) {
+        const ordersData = await ordersResponse.json();
+        setRecentOrders(ordersData.data || []);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.3,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.4 },
+    },
+  };
 
   return (
-    <div>
-      <h2 className="text-3xl font-bold mb-8 text-[#3b2f2f]">Dashboard</h2>
+    <ProtectedRoute>
+      <motion.div
+        className="min-h-screen bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50 p-4 md:p-8"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        {/* Welcome Section */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-12"
+        >
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
+            Welcome back, <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">{user?.firstName}!</span>
+          </h1>
+          <p className="text-gray-600 text-lg">
+            {new Date().toLocaleDateString('en-US', {
+              weekday: 'long',
+              month: 'long',
+              day: 'numeric',
+            })}
+          </p>
+        </motion.div>
 
-      <div className="grid md:grid-cols-3 gap-6">
-        {stats.map((stat, i) => (
-          <motion.div
-            key={i}
-            whileHover={{ scale: 1.05 }}
-            className="bg-white/50 p-6 rounded-xl shadow-xl border border-[#daa520]/20"
-          >
-            <h3 className="text-[#8b7b7b]">{stat.title}</h3>
-            <p className="text-2xl font-bold mt-2 text-[#3b2f2f]">{stat.value}</p>
+        {/* Quick Actions */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12"
+        >
+          <motion.div variants={itemVariants}>
+            <Link href="/search">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition text-left border-l-4 border-indigo-600"
+              >
+                <div className="text-3xl mb-2">🔍</div>
+                <h3 className="text-lg font-bold text-gray-900">Search Foods</h3>
+                <p className="text-sm text-gray-600">Find your favorite dishes</p>
+              </motion.button>
+            </Link>
           </motion.div>
-        ))}
-      </div>
-    </div>
+
+          <motion.div variants={itemVariants}>
+            <Link href="/favorites">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition text-left border-l-4 border-red-500"
+              >
+                <div className="text-3xl mb-2">❤️</div>
+                <h3 className="text-lg font-bold text-gray-900">My Favorites</h3>
+                <p className="text-sm text-gray-600">View saved items</p>
+              </motion.button>
+            </Link>
+          </motion.div>
+
+          <motion.div variants={itemVariants}>
+            <Link href="/notifications">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition text-left border-l-4 border-yellow-500"
+              >
+                <div className="text-3xl mb-2">🔔</div>
+                <h3 className="text-lg font-bold text-gray-900">Notifications</h3>
+                <p className="text-sm text-gray-600">Latest updates</p>
+              </motion.button>
+            </Link>
+          </motion.div>
+        </motion.div>
+
+        {/* Statistics */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
+        >
+          {/* Total Spent */}
+          <motion.div
+            variants={itemVariants}
+            className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg"
+          >
+            <div className="text-sm font-semibold opacity-90">Total Spent</div>
+            <div className="text-3xl font-bold mt-2">
+              ₹{stats?.totalSpent || '0'}
+            </div>
+            <p className="text-sm opacity-75 mt-2">
+              {stats?.totalOrders || 0} orders placed
+            </p>
+          </motion.div>
+
+          {/* Total Saved */}
+          <motion.div
+            variants={itemVariants}
+            className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg"
+          >
+            <div className="text-sm font-semibold opacity-90">Total Saved</div>
+            <div className="text-3xl font-bold mt-2">
+              ₹{stats?.totalSaved || '0'}
+            </div>
+            <p className="text-sm opacity-75 mt-2">With our discounts</p>
+          </motion.div>
+
+          {/* Average Order */}
+          <motion.div
+            variants={itemVariants}
+            className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg"
+          >
+            <div className="text-sm font-semibold opacity-90">Average Order</div>
+            <div className="text-3xl font-bold mt-2">
+              ₹{stats?.totalOrders && stats.totalSpent ? Math.round(stats.totalSpent / stats.totalOrders) : '0'}
+            </div>
+            <p className="text-sm opacity-75 mt-2">Per transaction</p>
+          </motion.div>
+        </motion.div>
+
+        {/* Recent Orders */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-xl shadow-lg p-6 md:p-8"
+        >
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Recent Orders</h2>
+            <Link href="/orders">
+              <motion.a
+                whileHover={{ x: 5 }}
+                className="text-indigo-600 font-semibold hover:text-indigo-700"
+              >
+                View All →
+              </motion.a>
+            </Link>
+          </div>
+
+          {loading ? (
+            <div className="text-center py-8">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+            </div>
+          ) : recentOrders.length > 0 ? (
+            <div className="space-y-4">
+              {recentOrders.map((order, index) => (
+                <motion.div
+                  key={order.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-indigo-300 hover:bg-indigo-50 transition"
+                >
+                  <div className="flex-1">
+                    <p className="font-semibold text-gray-900">
+                      Order #{order.id}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-gray-900">₹{order.totalPrice}</p>
+                    <motion.span
+                      whileHover={{ scale: 1.05 }}
+                      className={`inline-block text-xs font-semibold px-3 py-1 rounded-full mt-1 ${
+                        order.status === 'delivered'
+                          ? 'bg-green-100 text-green-800'
+                          : order.status === 'pending'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-blue-100 text-blue-800'
+                      }`}
+                    >
+                      {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                    </motion.span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-600 text-lg mb-4">No orders yet</p>
+              <Link href="/search">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition"
+                >
+                  Order Now
+                </motion.button>
+              </Link>
+            </div>
+          )}
+        </motion.div>
+      </motion.div>
+    </ProtectedRoute>
   );
 }
