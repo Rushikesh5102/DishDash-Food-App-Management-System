@@ -111,7 +111,7 @@ export const getRatings = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       count: ratings.length,
-      averageRating: parseFloat(averageRating) || 0,
+      averageRating: parseFloat(averageRating || '0') || 0,
       ratings,
     });
   } catch (error: any) {
