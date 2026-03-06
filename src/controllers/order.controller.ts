@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import * as orderService from '../services/order.service';
-import Order from '../models/order.model';
+import { Order } from '../models/order.model';
 import Product from '../models/product.model';
 import Platform from '../models/platform.model';
-import Restaurant from '../models/restaurant.model';
+import { Restaurant } from '../models/restaurant.model';
 
 export const createOrder = async (req: Request, res: Response, next: NextFunction) => {
     try {
