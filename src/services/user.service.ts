@@ -9,7 +9,7 @@ const generateToken = (id: number) => {
 };
 
 export const registerUser = async (userData: any) => {
-  const { name, email, password, address } = userData;
+  const { firstName, lastName, email, password, phone, address, city, pincode } = userData;
   const userExists = await User.findOne({ where: { email } });
 
   if (userExists) {
@@ -17,18 +17,26 @@ export const registerUser = async (userData: any) => {
   }
 
   const user = await User.create({
-    name,
+    firstName,
+    lastName,
     email,
     password,
+    phone,
     address,
+    city,
+    pincode,
   });
 
   if (user) {
     return {
       id: user.id,
-      name: user.name,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
+      phone: user.phone,
       address: user.address,
+      city: user.city,
+      pincode: user.pincode,
       token: generateToken(user.id),
     };
   } else {
@@ -43,8 +51,13 @@ export const loginUser = async (userData: any) => {
   if (user && (await bcrypt.compare(password, user.password!))) {
     return {
       id: user.id,
-      name: user.name,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
+      phone: user.phone,
+      address: user.address,
+      city: user.city,
+      pincode: user.pincode,
       token: generateToken(user.id),
     };
   } else {
@@ -64,18 +77,26 @@ export const updateUserProfile = async (userId: number, userData: Partial<User>)
     const user = await User.findByPk(userId);
 
     if (user) {
-        user.name = userData.name || user.name;
+        user.firstName = userData.firstName || user.firstName;
+        user.lastName = userData.lastName || user.lastName;
         user.email = userData.email || user.email;
+        user.phone = userData.phone || user.phone;
         user.address = userData.address || user.address;
+        user.city = userData.city || user.city;
+        user.pincode = userData.pincode || user.pincode;
         if (userData.password) {
             user.password = userData.password;
         }
         const updatedUser = await user.save();
         return {
             id: updatedUser.id,
-            name: updatedUser.name,
+            firstName: updatedUser.firstName,
+            lastName: updatedUser.lastName,
             email: updatedUser.email,
+            phone: updatedUser.phone,
             address: updatedUser.address,
+            city: updatedUser.city,
+            pincode: updatedUser.pincode,
             token: generateToken(updatedUser.id),
         };
     } else {
