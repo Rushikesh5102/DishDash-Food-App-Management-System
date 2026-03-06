@@ -424,7 +424,48 @@ export default function SearchPage() {
 
                   <div className="border-b border-gray-200 mb-6"></div>
 
-                  {/* Platform Prices Grid */}
+                  {/* Filter Options Inside Modal */}
+                  <div className="mb-6 flex items-center gap-3 flex-wrap">
+                    <span className="text-sm font-semibold text-gray-700">Sort by:</span>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setSortBy('default')}
+                      className={`px-3 py-1.5 rounded-full text-sm font-semibold transition-all ${
+                        sortBy === 'default'
+                          ? 'bg-gradient-to-r from-amber-600 to-pink-600 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      Default
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setSortBy('fastest')}
+                      className={`px-3 py-1.5 rounded-full text-sm font-semibold transition-all ${
+                        sortBy === 'fastest'
+                          ? 'bg-gradient-to-r from-amber-600 to-pink-600 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      ⚡ Fastest
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setSortBy('price')}
+                      className={`px-3 py-1.5 rounded-full text-sm font-semibold transition-all ${
+                        sortBy === 'price'
+                          ? 'bg-gradient-to-r from-amber-600 to-pink-600 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      💰 Price
+                    </motion.button>
+                  </div>
+
+                  <div className="border-b border-gray-200 mb-6"></div>
                   <div className="space-y-4">
                     <h3 className="text-xl font-bold text-gray-900 mb-4">
                       Available on {platforms.length} Platforms
