@@ -99,7 +99,7 @@ export default function DashboardPage() {
   return (
     <ProtectedRoute>
       <motion.div
-        className="min-h-screen bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50 p-4 md:p-8"
+        className="min-h-screen bg-gradient-to-br from-gray-50 via-amber-50 to-pink-50 p-4 md:p-8"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
@@ -110,7 +110,7 @@ export default function DashboardPage() {
           className="mb-12"
         >
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
-            Welcome back, <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">{user?.firstName}!</span>
+            Welcome back, <span className="bg-gradient-to-r from-amber-600 to-pink-600 bg-clip-text text-transparent">{user?.firstName}!</span>
           </h1>
           <p className="text-gray-600 text-lg">
             {new Date().toLocaleDateString('en-US', {
@@ -133,7 +133,7 @@ export default function DashboardPage() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-full bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition text-left border-l-4 border-indigo-600"
+                className="w-full bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition text-left border-l-4 border-amber-600"
               >
                 <div className="text-3xl mb-2">🔍</div>
                 <h3 className="text-lg font-bold text-gray-900">Search Foods</h3>
@@ -147,7 +147,7 @@ export default function DashboardPage() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-full bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition text-left border-l-4 border-red-500"
+                className="w-full bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition text-left border-l-4 border-pink-500"
               >
                 <div className="text-3xl mb-2">❤️</div>
                 <h3 className="text-lg font-bold text-gray-900">My Favorites</h3>
@@ -161,7 +161,7 @@ export default function DashboardPage() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-full bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition text-left border-l-4 border-yellow-500"
+                className="w-full bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition text-left border-l-4 border-amber-500"
               >
                 <div className="text-3xl mb-2">🔔</div>
                 <h3 className="text-lg font-bold text-gray-900">Notifications</h3>
@@ -181,7 +181,7 @@ export default function DashboardPage() {
           {/* Total Spent */}
           <motion.div
             variants={itemVariants}
-            className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg"
+            className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl p-6 text-white shadow-lg"
           >
             <div className="text-sm font-semibold opacity-90">Total Spent</div>
             <div className="text-3xl font-bold mt-2">
@@ -195,7 +195,7 @@ export default function DashboardPage() {
           {/* Total Saved */}
           <motion.div
             variants={itemVariants}
-            className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg"
+            className="bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl p-6 text-white shadow-lg"
           >
             <div className="text-sm font-semibold opacity-90">Total Saved</div>
             <div className="text-3xl font-bold mt-2">
@@ -207,7 +207,7 @@ export default function DashboardPage() {
           {/* Average Order */}
           <motion.div
             variants={itemVariants}
-            className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg"
+            className="bg-gradient-to-br from-amber-600 to-pink-600 rounded-xl p-6 text-white shadow-lg"
           >
             <div className="text-sm font-semibold opacity-90">Average Order</div>
             <div className="text-3xl font-bold mt-2">
@@ -225,19 +225,14 @@ export default function DashboardPage() {
         >
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Recent Orders</h2>
-            <Link href="/orders">
-              <motion.a
-                whileHover={{ x: 5 }}
-                className="text-indigo-600 font-semibold hover:text-indigo-700"
-              >
-                View All →
-              </motion.a>
+            <Link href="/orders" className="text-amber-600 font-semibold hover:text-amber-700 transition">
+              View All →
             </Link>
           </div>
 
           {loading ? (
             <div className="text-center py-8">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
             </div>
           ) : recentOrders.length > 0 ? (
             <div className="space-y-4">
@@ -247,7 +242,7 @@ export default function DashboardPage() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-indigo-300 hover:bg-indigo-50 transition"
+                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-amber-300 hover:bg-amber-50 transition"
                 >
                   <div className="flex-1">
                     <p className="font-semibold text-gray-900">
@@ -281,7 +276,7 @@ export default function DashboardPage() {
               <Link href="/search">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
-                  className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition"
+                  className="bg-gradient-to-r from-amber-600 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition"
                 >
                   Order Now
                 </motion.button>
