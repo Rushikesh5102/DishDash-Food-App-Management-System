@@ -3,13 +3,10 @@ import { sequelize } from '../config/db';
 
 class Product extends Model {
   public id!: number;
+  public restaurantId!: number;
   public name!: string;
   public category!: string;
-  public restaurantName!: string;
   public imageUrl!: string | null;
-
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
 }
 
 Product.init(
@@ -18,6 +15,11 @@ Product.init(
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
+    },
+
+    restaurantId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
 
     name: {
@@ -30,11 +32,6 @@ Product.init(
       allowNull: false,
     },
 
-    restaurantName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-
     imageUrl: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -43,7 +40,7 @@ Product.init(
   {
     sequelize,
     tableName: 'products',
-    timestamps: true,
+    timestamps: false,
   }
 );
 

@@ -32,6 +32,7 @@ Restaurant.init({
 }, {
   sequelize,
   tableName: 'restaurants',
+  timestamps: false,
 });
 
 class MenuItem extends Model {

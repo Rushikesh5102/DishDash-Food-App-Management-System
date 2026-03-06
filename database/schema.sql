@@ -3,6 +3,9 @@
 -- Database Schema
 -- ========================================
 
+CREATE DATABASE IF NOT EXISTS food_delivery;
+USE food_delivery;
+
 -- 1️⃣ Platforms Table
 CREATE TABLE platforms (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -38,7 +41,7 @@ CREATE TABLE products (
 );
 
 -- 4️⃣ Platform Listings Table (Junction Table)
-CREATE TABLE platformListings (
+CREATE TABLE platform_listings (
     id INT AUTO_INCREMENT PRIMARY KEY,
     productId INT NOT NULL,
     platformId INT NOT NULL,
@@ -69,5 +72,5 @@ CREATE TABLE platformListings (
 -- Indexes
 CREATE INDEX idx_product_name ON products(name);
 CREATE INDEX idx_restaurant_name ON restaurants(name);
-CREATE INDEX idx_platform_id ON platformListings(platformId);
-CREATE INDEX idx_product_id ON platformListings(productId);
+CREATE INDEX idx_platform_id ON platform_listings(platformId);
+CREATE INDEX idx_product_id ON platform_listings(productId);

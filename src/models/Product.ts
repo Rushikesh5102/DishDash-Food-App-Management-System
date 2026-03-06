@@ -3,8 +3,9 @@ import { sequelize } from '../config/db';
 
 class Product extends Model {
   public id!: number;
+  public restaurantId!: number;
   public name!: string;
-  public description!: string;
+  public category!: string;
   public imageUrl!: string;
 }
 
@@ -15,11 +16,15 @@ Product.init(
       autoIncrement: true,
       primaryKey: true,
     },
+    restaurantId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    description: {
+    category: {
       type: DataTypes.STRING,
       allowNull: true,
     },

@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
+import { searchAndCompareProduct } from "@/lib/api";
+import { motion } from "framer-motion";
 
 export default function OrdersPage() {
   const [query, setQuery] = useState("");
@@ -9,6 +11,8 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [sortBy, setSortBy] = useState("cheapest");
+  const [savedOrders, setSavedOrders] = useState<any[]>([]);
+  const [viewMode, setViewMode] = useState<"search" | "saved">("search");
 
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
@@ -16,14 +20,17 @@ export default function OrdersPage() {
   useEffect(() => {
     const stored = localStorage.getItem("recentSearches");
     if (stored) setRecentSearches(JSON.parse(stored));
+    
+    const saved = localStorage.getItem("savedOrders");
+    if (saved) setSavedOrders(JSON.parse(saved));
   }, []);
 
   const popularItems = [
     "Chicken Biryani",
     "Veg Burger",
+    "Margherita Pizza",
+    "Salmon Sushi Roll",
     "Paneer Butter Masala",
-    "Pizza",
-    "Fried Rice",
   ];
 
   useEffect(() => {
@@ -47,15 +54,7 @@ export default function OrdersPage() {
     setSuggestions([]);
 
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/products/compare/search?product=${encodeURIComponent(
-          finalQuery
-        )}`
-      );
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-
+      const data = await searchAndCompareProduct(finalQuery);
       setResults(data);
 
       const updatedRecent = [
@@ -70,9 +69,26 @@ export default function OrdersPage() {
       );
     } catch (err: any) {
       setError(err.message || "Error fetching results");
+      console.error("Search error:", err);
     }
 
     setLoading(false);
+  };
+
+  const saveOrder = (item: any) => {
+    const newOrder = {
+      ...item,
+      savedAt: new Date().toISOString(),
+    };
+    const updated = [newOrder, ...savedOrders];
+    setSavedOrders(updated);
+    localStorage.setItem("savedOrders", JSON.stringify(updated));
+  };
+
+  const removeOrder = (index: number) => {
+    const updated = savedOrders.filter((_, i) => i !== index);
+    setSavedOrders(updated);
+    localStorage.setItem("savedOrders", JSON.stringify(updated));
   };
 
   return (
@@ -87,7 +103,7 @@ export default function OrdersPage() {
             Smart Food Price Comparison
           </h1>
           <p className="text-[#8b7b7b] text-lg">
-            Compare Swiggy, Zomato & Uber Eats instantly.
+            Compare Swiggy, Zomato, Eatsure, Maginpin & Dunzo instantly.
           </p>
 
           {/* SEARCH */}
@@ -185,21 +201,35 @@ export default function OrdersPage() {
                   {processed.map((item: any, index: number) => (
                     <div
                       key={index}
-                      className="p-8 rounded-2xl border bg-white/40 border-[#daa520]/20 hover:scale-[1.03] transition-all"
+                      className="p-8 rounded-2xl border bg-white/40 border-[#daa520]/20 hover:scale-[1.03] transition-all overflow-hidden"
                     >
+                      {item.productImage && (
+                        <img
+                          src={item.productImage}
+                          alt={item.productName}
+                          className="w-full h-48 object-cover rounded-xl mb-4"
+                        />
+                      )}
+                      <h2 className="text-2xl font-bold text-[#3b2f2f] mb-3">
+                        {item.productName}
+                      </h2>
                       <div className="flex items-center gap-3 mb-4">
                         <img
                           src={`https://logo.clearbit.com/${item.platform
                             .toLowerCase()
                             .replace(" ", "")}.com`}
                           className="w-8 h-8 rounded"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src =
+                              'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect fill="%23daa520" width="100" height="100"/%3E%3C/svg%3E';
+                          }}
                         />
                         <h3 className="text-xl font-semibold text-[#3b2f2f]">
                           {item.platform}
                         </h3>
                       </div>
 
-                      <p className="text-[#8b7b7b] text-sm">
+                      <p className="text-[#8b7b7b] text-sm mb-2">
                         ETA: {item.etaMinutes} mins
                       </p>
 

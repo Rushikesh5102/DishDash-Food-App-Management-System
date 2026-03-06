@@ -23,8 +23,8 @@ CREATE TABLE users (
 INSERT INTO users VALUES
 (1,'Rahul Sharma','rahul@gmail.com'),
 (2,'Priya Mehta','priya@gmail.com'),
-(3,'Amit Patil','amit@gmail.com'),
-(4,'Sneha Kulkarni','sneha@gmail.com'),
+(3,'Amit Patil','iloveamit@gmail.com'),
+(4,'Neha Kulkarni','neha@gmail.com'),
 (5,'Aditya Deshmukh','aditya@gmail.com');
 
 -- --------------------------------------------------

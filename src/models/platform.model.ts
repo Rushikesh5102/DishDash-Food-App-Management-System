@@ -6,9 +6,6 @@ class Platform extends Model {
   public name!: string;
   public logoUrl!: string | null;
   public serviceArea!: string;
-
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
 }
 
 Platform.init(
@@ -38,7 +35,7 @@ Platform.init(
   {
     sequelize,
     tableName: 'platforms',
-    timestamps: true,
+    timestamps: false,
   }
 );
 

@@ -9,12 +9,12 @@ import PlatformListing from '../models/platformListing.model';
 ========================= */
 export const createProduct = async (req: Request, res: Response) => {
   try {
-    const { name, category, restaurantName, imageUrl } = req.body;
+    const { name, category, restaurantId, imageUrl } = req.body;
 
     const product = await Product.create({
       name,
       category,
-      restaurantName,
+      restaurantId,
       imageUrl,
     });
 
@@ -137,6 +137,8 @@ export const compareSearch = async (req: Request, res: Response) => {
       const finalPrice = basePrice + deliveryFee - discount;
 
       return {
+        productName: foundProduct.name,
+        productImage: foundProduct.imageUrl,
         platform: listing.Platform.name,
         basePrice,
         deliveryFee,
@@ -158,6 +160,13 @@ export const compareSearch = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Comparison error:', error);
-    res.status(500).json({ message: 'Error comparing prices' });
+    console.error('Error details:', {
+      message: (error as any)?.message,
+      stack: (error as any)?.stack,
+    });
+    res.status(500).json({ 
+      message: 'Error comparing prices',
+      error: (error as any)?.message 
+    });
   }
 };

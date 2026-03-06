@@ -13,9 +13,6 @@ class PlatformListing extends Model {
   public discountValue!: number;
   public etaMinutes!: number;
   public redirectUrl!: string;
-
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
 }
 
 PlatformListing.init(
@@ -61,6 +58,7 @@ PlatformListing.init(
   {
     sequelize,
     tableName: "platform_listings",
+    timestamps: false,
   }
 );
 
