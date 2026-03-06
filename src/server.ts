@@ -10,6 +10,9 @@ import PlatformListing from './models/platformListing.model';
 import { Restaurant } from './models/restaurant.model';
 import User from './models/user.model';
 import { Order } from './models/order.model';
+import Favorite from './models/favorite.model';
+import Rating from './models/rating.model';
+import Notification from './models/notification.model';
 
 const start = async () => {
   try {
@@ -30,6 +33,39 @@ const start = async () => {
     // Restaurant & Product relation
     Restaurant.hasMany(Product, { foreignKey: 'restaurantId' });
     Product.belongsTo(Restaurant, { foreignKey: 'restaurantId' });
+
+    // User relations
+    User.hasMany(Order, { foreignKey: 'userId' });
+    Order.belongsTo(User, { foreignKey: 'userId' });
+
+    User.hasMany(Favorite, { foreignKey: 'userId' });
+    Favorite.belongsTo(User, { foreignKey: 'userId' });
+
+    User.hasMany(Rating, { foreignKey: 'userId' });
+    Rating.belongsTo(User, { foreignKey: 'userId' });
+
+    User.hasMany(Notification, { foreignKey: 'userId' });
+    Notification.belongsTo(User, { foreignKey: 'userId' });
+
+    // Order associations
+    Order.belongsTo(Product, { foreignKey: 'productId' });
+    Order.belongsTo(Platform, { foreignKey: 'platformId' });
+    Order.belongsTo(Restaurant, { foreignKey: 'restaurantId' });
+
+    Order.hasMany(Rating, { foreignKey: 'orderId' });
+    Rating.belongsTo(Order, { foreignKey: 'orderId' });
+
+    // Favorite associations
+    Favorite.belongsTo(Product, { foreignKey: 'productId' });
+    Favorite.belongsTo(Platform, { foreignKey: 'platformId' });
+
+    // Rating associations
+    Rating.belongsTo(Product, { foreignKey: 'productId' });
+    Rating.belongsTo(Platform, { foreignKey: 'platformId' });
+    Rating.belongsTo(Restaurant, { foreignKey: 'restaurantId' });
+
+    // Notification associations
+    Notification.belongsTo(Order, { foreignKey: 'orderId' });
 
     // 3. Sync Tables
     // Using alter: false to avoid schema conflicts with existing database

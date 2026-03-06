@@ -6,6 +6,10 @@ import productRoutes from './routes/product.routes';
 import platformRoutes from './routes/platform.routes';
 import orderRoutes from './routes/order.routes';
 import restaurantRoutes from './routes/restaurant.routes';
+import authRoutes from './routes/auth.routes';
+import favoriteRoutes from './routes/favorite.routes';
+import ratingRoutes from './routes/rating.routes';
+import notificationRoutes from './routes/notification.routes';
 
 const app = express();
 
@@ -37,11 +41,15 @@ app.get('/health', (req, res) => {
 });
 
 // ✅ Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/platforms', platformRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/restaurants', restaurantRoutes);
+app.use('/api/favorites', favoriteRoutes);
+app.use('/api/ratings', ratingRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // ✅ 404 handler
 app.use((req, res) => {

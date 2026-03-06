@@ -4,15 +4,26 @@ import User from './user.model';
 import { Restaurant } from './restaurant.model';
 
 /* ===========================
-   ORDER MODEL
+   ORDER MODEL (Enhanced)
 =========================== */
 
 interface OrderAttributes {
   id: number;
-  totalPrice: number;
-  status: 'Pending' | 'Preparing' | 'Delivered' | 'Cancelled';
   userId: number;
-  restaurantId: number;
+  productId?: number;
+  platformId?: number;
+  restaurantId?: number;
+  platformName?: string;
+  restaurantName?: string;
+  productName?: string;
+  price?: number;
+  deliveryFee?: number;
+  totalPrice: number;
+  discount?: number;
+  status: 'pending' | 'confirmed' | 'delivered' | 'cancelled';
+  orderDate?: Date;
+  deliveryDate?: Date;
+  notes?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -25,10 +36,21 @@ class Order
   implements OrderAttributes
 {
   public id!: number;
-  public totalPrice!: number;
-  public status!: 'Pending' | 'Preparing' | 'Delivered' | 'Cancelled';
   public userId!: number;
-  public restaurantId!: number;
+  public productId?: number;
+  public platformId?: number;
+  public restaurantId?: number;
+  public platformName?: string;
+  public restaurantName?: string;
+  public productName?: string;
+  public price?: number;
+  public deliveryFee?: number;
+  public totalPrice!: number;
+  public discount?: number;
+  public status!: 'pending' | 'confirmed' | 'delivered' | 'cancelled';
+  public orderDate?: Date;
+  public deliveryDate?: Date;
+  public notes?: string;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -41,31 +63,53 @@ Order.init(
       autoIncrement: true,
       primaryKey: true,
     },
-
-    totalPrice: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: false,
-    },
-
-    status: {
-      type: DataTypes.ENUM(
-        'Pending',
-        'Preparing',
-        'Delivered',
-        'Cancelled'
-      ),
-      allowNull: false,
-      defaultValue: 'Pending',
-    },
-
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-
+    productId: {
+      type: DataTypes.INTEGER,
+    },
+    platformId: {
+      type: DataTypes.INTEGER,
+    },
     restaurantId: {
       type: DataTypes.INTEGER,
+    },
+    platformName: {
+      type: DataTypes.STRING(100),
+    },
+    restaurantName: {
+      type: DataTypes.STRING(255),
+    },
+    productName: {
+      type: DataTypes.STRING(255),
+    },
+    price: {
+      type: DataTypes.DECIMAL(10, 2),
+    },
+    deliveryFee: {
+      type: DataTypes.DECIMAL(10, 2),
+    },
+    totalPrice: {
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
+    },
+    discount: {
+      type: DataTypes.DECIMAL(10, 2),
+    },
+    status: {
+      type: DataTypes.ENUM('pending', 'confirmed', 'delivered', 'cancelled'),
+      defaultValue: 'pending',
+    },
+    orderDate: {
+      type: DataTypes.DATE,
+    },
+    deliveryDate: {
+      type: DataTypes.DATE,
+    },
+    notes: {
+      type: DataTypes.TEXT,
     },
   },
   {

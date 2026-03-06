@@ -27,7 +27,10 @@ router.post('/listing', productController.addPlatformListing);
    COMPARE PRODUCT
 =========================== */
 
-// Compare product prices
+// Compare product prices by product name
 router.get('/compare/search', productController.compareSearch);
+
+// Compare all products by restaurant
+router.get('/restaurant/:restaurantId/compare', productController.compareByRestaurant);
 
 export default router;
