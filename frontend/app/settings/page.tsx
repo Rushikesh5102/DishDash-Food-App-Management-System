@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/authContext';
-import ProtectedRoute from '@/lib/ProtectedRoute';
+import { ProtectedRoute } from '@/lib/ProtectedRoute';
 import { motion } from 'framer-motion';
 
 export default function SettingsPage() {

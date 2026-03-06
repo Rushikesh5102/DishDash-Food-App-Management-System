@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/authContext';
-import ProtectedRoute from '@/lib/ProtectedRoute';
+import { ProtectedRoute } from '@/lib/ProtectedRoute';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
