@@ -63,7 +63,7 @@ export const getOrderById = async (id: number): Promise<Order | null> => {
 
 export const updateOrderStatus = async (
   id: number,
-  status: 'Pending' | 'Preparing' | 'Delivered' | 'Cancelled'
+  status: 'pending' | 'confirmed' | 'delivered' | 'cancelled'
 ): Promise<Order | null> => {
   const order = await Order.findByPk(id);
 
