@@ -35,6 +35,21 @@ export default function SearchPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [sortBy, setSortBy] = useState<'price' | 'fastest' | 'default'>('default');
 
+  // Re-sort platform prices when filter changes
+  useEffect(() => {
+    if (platformPrices.length > 0) {
+      let sorted = [...platformPrices];
+      if (sortBy === 'fastest') {
+        sorted.sort((a, b) => a.eta - b.eta);
+      } else if (sortBy === 'price') {
+        sorted.sort((a, b) => a.price + a.deliveryFee - b.price - b.deliveryFee);
+      } else {
+        sorted.sort((a, b) => a.price + a.deliveryFee - b.price - b.deliveryFee);
+      }
+      setPlatformPrices(sorted);
+    }
+  }, [sortBy]);
+
   const popularItems = [
     'Chicken Biryani',
     'Veg Burger',
