@@ -2,7 +2,7 @@
 
 import './globals.css';
 import { AuthProvider } from '@/lib/authContext';
-import Header from '@/components/Header';
+import { Header } from '@/components/Header';
 import { Toaster } from 'react-hot-toast';
 
 export default function RootLayout({
