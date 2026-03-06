@@ -70,7 +70,7 @@ export default function AnalyticsPage() {
   return (
     <ProtectedRoute>
       <motion.div
-        className="min-h-screen bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50 p-4 md:p-8"
+        className="min-h-screen bg-gradient-to-br from-gray-50 via-amber-50 to-pink-50 p-4 md:p-8"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
@@ -86,7 +86,7 @@ export default function AnalyticsPage() {
 
         {loading ? (
           <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
           </div>
         ) : error ? (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
@@ -117,7 +117,7 @@ export default function AnalyticsPage() {
               {/* Total Orders */}
               <motion.div
                 variants={itemVariants}
-                className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-indigo-600"
+                className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-amber-600"
               >
                 <p className="text-gray-600 text-sm font-semibold">Total Orders</p>
                 <p className="text-4xl font-bold text-gray-900 mt-2">
@@ -158,7 +158,7 @@ export default function AnalyticsPage() {
               {/* Savings Rate */}
               <motion.div
                 variants={itemVariants}
-                className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white"
+                className="bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl shadow-lg p-6 text-white"
               >
                 <p className="text-sm font-semibold opacity-90">Average Savings</p>
                 <p className="text-4xl font-bold mt-2">
@@ -260,12 +260,12 @@ export default function AnalyticsPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg border border-purple-200"
+                    className="p-4 bg-gradient-to-br from-pink-50 to-pink-100 rounded-lg border border-pink-200"
                   >
                     <p className="text-gray-700 text-sm font-semibold mb-1">
                       Next Goal
                     </p>
-                    <p className="text-2xl font-bold text-purple-600">
+                    <p className="text-2xl font-bold text-pink-600">
                       Save ₹500 more
                     </p>
                   </motion.div>

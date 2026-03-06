@@ -45,7 +45,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-pink-50 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         {/* Animated Header */}
         <motion.div
@@ -54,7 +54,7 @@ export default function LoginPage() {
           className="text-center mb-8"
         >
           <div className="text-5xl mb-4">🍽️</div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-amber-600 to-pink-600 bg-clip-text text-transparent mb-2">
             DishDash
           </h1>
           <p className="text-gray-600 text-lg">Smart Food Delivery Comparison</p>
@@ -105,7 +105,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
               />
             </div>
 
@@ -114,7 +114,7 @@ export default function LoginPage() {
               <input
                 type="checkbox"
                 id="remember"
-                className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
+                className="w-4 h-4 text-amber-600 rounded focus:ring-amber-500"
               />
               <label htmlFor="remember" className="ml-2 text-sm text-gray-700">
                 Remember me
@@ -127,7 +127,7 @@ export default function LoginPage() {
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-3 rounded-lg hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-amber-600 to-pink-600 text-white font-bold py-3 rounded-lg hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </motion.button>
@@ -147,7 +147,7 @@ export default function LoginPage() {
           {/* Signup Link */}
           <p className="text-center text-gray-600 mt-6">
             Don't have an account?{' '}
-            <Link href="/signup" className="text-indigo-600 font-semibold hover:text-indigo-700">
+            <Link href="/signup" className="text-amber-600 font-semibold hover:text-amber-700">
               Sign Up
             </Link>
           </p>

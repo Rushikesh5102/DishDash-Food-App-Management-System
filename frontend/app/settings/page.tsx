@@ -101,7 +101,7 @@ export default function SettingsPage() {
   return (
     <ProtectedRoute>
       <motion.div
-        className="min-h-screen bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50 p-4 md:p-8"
+        className="min-h-screen bg-gradient-to-br from-gray-50 via-amber-50 to-pink-50 p-4 md:p-8"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
@@ -162,7 +162,7 @@ export default function SettingsPage() {
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
                   />
                 </div>
                 <div>
@@ -174,7 +174,7 @@ export default function SettingsPage() {
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
                   />
                 </div>
               </div>
@@ -205,7 +205,7 @@ export default function SettingsPage() {
                   value={formData.phone}
                   onChange={handleInputChange}
                   placeholder="9876543210"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
                 />
               </div>
 
@@ -220,7 +220,7 @@ export default function SettingsPage() {
                   value={formData.address}
                   onChange={handleInputChange}
                   placeholder="123 Main St"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
                 />
               </div>
 
@@ -236,7 +236,7 @@ export default function SettingsPage() {
                     value={formData.city}
                     onChange={handleInputChange}
                     placeholder="Pune"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
                   />
                 </div>
                 <div>
@@ -249,7 +249,7 @@ export default function SettingsPage() {
                     value={formData.pincode}
                     onChange={handleInputChange}
                     placeholder="411001"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
                   />
                 </div>
               </div>
@@ -260,7 +260,7 @@ export default function SettingsPage() {
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-3 rounded-lg hover:shadow-lg transition disabled:opacity-50 mt-6"
+                className="w-full bg-gradient-to-r from-amber-600 to-pink-600 text-white font-bold py-3 rounded-lg hover:shadow-lg transition disabled:opacity-50 mt-6"
               >
                 {loading ? 'Saving...' : 'Save Changes'}
               </motion.button>
@@ -288,7 +288,7 @@ export default function SettingsPage() {
                   }
                   className={`w-12 h-6 rounded-full transition ${
                     preferences.notifications
-                      ? 'bg-indigo-600'
+                      ? 'bg-amber-600'
                       : 'bg-gray-300'
                   }`}
                 >
@@ -313,7 +313,7 @@ export default function SettingsPage() {
                   }
                   className={`w-12 h-6 rounded-full transition ${
                     preferences.emailUpdates
-                      ? 'bg-indigo-600'
+                      ? 'bg-amber-600'
                       : 'bg-gray-300'
                   }`}
                 >
@@ -335,7 +335,7 @@ export default function SettingsPage() {
                   onChange={(e) =>
                     handlePreferenceChange('currency', e.target.value)
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
                 >
                   <option value="INR">₹ INR (India)</option>
                   <option value="USD">$ USD (USA)</option>

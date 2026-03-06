@@ -76,7 +76,7 @@ export default function FavoritesPage() {
   return (
     <ProtectedRoute>
       <motion.div
-        className="min-h-screen bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50 p-4 md:p-8"
+        className="min-h-screen bg-gradient-to-br from-gray-50 via-amber-50 to-pink-50 p-4 md:p-8"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
@@ -99,7 +99,7 @@ export default function FavoritesPage() {
         >
           {loading ? (
             <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
             </div>
           ) : error ? (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
@@ -116,7 +116,7 @@ export default function FavoritesPage() {
                   className="bg-white rounded-xl shadow-md hover:shadow-xl transition border border-gray-200 overflow-hidden"
                 >
                   {/* Placeholder Image */}
-                  <div className="h-48 bg-gradient-to-br from-indigo-200 to-purple-200 flex items-center justify-center relative">
+                  <div className="h-48 bg-gradient-to-br from-amber-200 to-pink-200 flex items-center justify-center relative">
                     <div className="text-5xl">🍕</div>
                     <motion.button
                       whileHover={{ scale: 1.2 }}
@@ -162,7 +162,7 @@ export default function FavoritesPage() {
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2 rounded-lg font-semibold hover:shadow-lg transition"
+                      className="w-full bg-gradient-to-r from-amber-600 to-pink-600 text-white py-2 rounded-lg font-semibold hover:shadow-lg transition"
                     >
                       Compare Now
                     </motion.button>
@@ -182,7 +182,7 @@ export default function FavoritesPage() {
               <Link href="/search">
                 <motion.a
                   whileHover={{ scale: 1.05 }}
-                  className="inline-block bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition"
+                  className="inline-block bg-gradient-to-r from-amber-600 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition"
                 >
                   Explore Foods
                 </motion.a>

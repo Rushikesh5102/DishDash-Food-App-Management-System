@@ -58,7 +58,7 @@ export default function OrdersPage() {
 
   const statusColorMap: Record<string, string> = {
     pending: 'bg-yellow-100 text-yellow-800',
-    confirmed: 'bg-blue-100 text-blue-800',
+    confirmed: 'bg-amber-100 text-amber-800',
     delivered: 'bg-green-100 text-green-800',
     cancelled: 'bg-red-100 text-red-800',
   };
@@ -66,7 +66,7 @@ export default function OrdersPage() {
   return (
     <ProtectedRoute>
       <motion.div
-        className="min-h-screen bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50 p-4 md:p-8"
+        className="min-h-screen bg-gradient-to-br from-gray-50 via-amber-50 to-pink-50 p-4 md:p-8"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
@@ -97,8 +97,8 @@ export default function OrdersPage() {
               }}
               className={`px-4 py-2 rounded-full font-semibold transition ${
                 filter === status
-                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:border-indigo-600'
+                  ? 'bg-gradient-to-r from-amber-600 to-pink-600 text-white shadow-lg'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:border-amber-600'
               }`}
             >
               {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -114,7 +114,7 @@ export default function OrdersPage() {
         >
           {loading ? (
             <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
             </div>
           ) : error ? (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
@@ -204,7 +204,7 @@ export default function OrdersPage() {
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-indigo-700 transition w-full"
+                      className="bg-amber-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-amber-700 transition w-full"
                     >
                       Rate Order
                     </motion.button>
@@ -223,7 +223,7 @@ export default function OrdersPage() {
               <motion.a
                 whileHover={{ scale: 1.05 }}
                 href="/search"
-                className="inline-block bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition"
+                className="inline-block bg-gradient-to-r from-amber-600 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition"
               >
                 Order Now
               </motion.a>

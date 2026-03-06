@@ -129,7 +129,7 @@ export default function NotificationsPage() {
 
   const typeColorMap: Record<string, string> = {
     order: 'bg-blue-50 border-blue-200',
-    promo: 'bg-purple-50 border-purple-200',
+    promo: 'bg-pink-50 border-pink-200',
     system: 'bg-gray-50 border-gray-200',
     delivery: 'bg-green-50 border-green-200',
   };
@@ -137,7 +137,7 @@ export default function NotificationsPage() {
   return (
     <ProtectedRoute>
       <motion.div
-        className="min-h-screen bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50 p-4 md:p-8"
+        className="min-h-screen bg-gradient-to-br from-gray-50 via-amber-50 to-pink-50 p-4 md:p-8"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
@@ -160,7 +160,7 @@ export default function NotificationsPage() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={markAllAsRead}
-              className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-indigo-700 transition"
+              className="bg-amber-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-amber-700 transition"
             >
               Mark All Read
             </motion.button>
@@ -181,8 +181,8 @@ export default function NotificationsPage() {
               onClick={() => setFilterType(type)}
               className={`px-4 py-2 rounded-full font-semibold transition ${
                 filterType === type
-                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:border-indigo-600'
+                  ? 'bg-gradient-to-r from-amber-600 to-pink-600 text-white shadow-lg'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:border-amber-600'
               }`}
             >
               {type === 'all' ? 'All' : typeIconMap[type as keyof typeof typeIconMap]} {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -198,7 +198,7 @@ export default function NotificationsPage() {
         >
           {loading ? (
             <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
             </div>
           ) : error ? (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
@@ -233,7 +233,7 @@ export default function NotificationsPage() {
 
                   <div className="flex items-center gap-2 flex-shrink-0">
                     {!notification.isRead && (
-                      <div className="w-3 h-3 bg-indigo-600 rounded-full"></div>
+                      <div className="w-3 h-3 bg-amber-600 rounded-full"></div>
                     )}
                     <motion.button
                       whileHover={{ scale: 1.1 }}
@@ -254,7 +254,7 @@ export default function NotificationsPage() {
                     <motion.a
                       whileHover={{ scale: 1.02 }}
                       href={notification.actionUrl}
-                      className="inline-block text-indigo-600 font-semibold hover:text-indigo-700"
+                      className="inline-block text-amber-600 font-semibold hover:text-amber-700"
                     >
                       View Details →
                     </motion.a>

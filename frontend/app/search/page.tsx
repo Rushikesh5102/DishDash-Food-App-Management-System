@@ -72,7 +72,7 @@ export default function SearchPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-pink-50 flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -96,7 +96,7 @@ export default function SearchPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-6 py-20">
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-pink-50 p-6 py-20">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -104,7 +104,7 @@ export default function SearchPage() {
         >
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-amber-600 to-pink-600 bg-clip-text text-transparent mb-2">
               🔍 Search Food
             </h1>
             <p className="text-gray-600 text-lg">
@@ -125,14 +125,14 @@ export default function SearchPage() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                className="w-full px-6 py-4 rounded-xl border-2 border-indigo-200 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 outline-none text-gray-900 placeholder-gray-500"
+                className="w-full px-6 py-4 rounded-xl border-2 border-amber-200 focus:border-amber-600 focus:ring-4 focus:ring-amber-100 outline-none text-gray-900 placeholder-gray-500"
               />
               <motion.button
                 onClick={() => handleSearch()}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 disabled={loading}
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-2 rounded-lg font-semibold disabled:opacity-50"
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-gradient-to-r from-amber-600 to-pink-600 text-white px-6 py-2 rounded-lg font-semibold disabled:opacity-50"
               >
                 {loading ? '🔄' : 'Search'}
               </motion.button>
@@ -157,7 +157,7 @@ export default function SearchPage() {
                     }}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="p-4 bg-white border-2 border-indigo-100 rounded-xl hover:border-indigo-600 transition-all text-center"
+                    className="p-4 bg-white border-2 border-amber-100 rounded-xl hover:border-amber-600 transition-all text-center"
                   >
                     <p className="font-semibold text-gray-900 text-sm">{item}</p>
                   </motion.button>
@@ -184,7 +184,7 @@ export default function SearchPage() {
               animate={{ opacity: 1 }}
               className="max-w-2xl mx-auto"
             >
-              <div className="animate-spin inline-block w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full mx-auto"></div>
+              <div className="animate-spin inline-block w-8 h-8 border-4 border-amber-200 border-t-amber-600 rounded-full mx-auto"></div>
               <p className="text-center text-gray-600 mt-4">Searching...</p>
             </motion.div>
           )}
@@ -203,7 +203,7 @@ export default function SearchPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.1 }}
                   whileHover={{ scale: 1.05 }}
-                  className="bg-white rounded-xl p-6 border-2 border-indigo-100 hover:border-indigo-600 transition-all shadow-md"
+                  className="bg-white rounded-xl p-6 border-2 border-amber-100 hover:border-amber-600 transition-all shadow-md"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <h3 className="font-bold text-gray-900 text-lg flex-1">
@@ -219,13 +219,13 @@ export default function SearchPage() {
                   <p className="text-gray-600 text-sm mb-4">{product.description}</p>
 
                   <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                    <span className="text-2xl font-bold text-indigo-600">
+                    <span className="text-2xl font-bold text-amber-600">
                       ₹{product.price}
                     </span>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-lg font-semibold"
+                      className="bg-gradient-to-r from-amber-600 to-pink-600 text-white px-4 py-2 rounded-lg font-semibold"
                     >
                       View Options
                     </motion.button>
@@ -250,7 +250,7 @@ export default function SearchPage() {
                   setResults([]);
                 }}
                 whileHover={{ scale: 1.05 }}
-                className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold"
+                className="px-6 py-3 bg-gradient-to-r from-amber-600 to-pink-600 text-white rounded-lg font-semibold"
               >
                 Clear Search
               </motion.button>
