@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface Product {
   id: number;
   name: string;
+  restaurant: string;
   description: string;
   price: number;
   image?: string;
@@ -32,6 +33,7 @@ export default function SearchPage() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [platformPrices, setPlatformPrices] = useState<PlatformPrice[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<'price' | 'fastest' | 'default'>('default');
 
   const popularItems = [
     'Chicken Biryani',
@@ -45,10 +47,21 @@ export default function SearchPage() {
   ];
 
   const platforms = [
-    { name: 'Swiggy', color: 'from-orange-400 to-orange-500' },
-    { name: 'Zomato', color: 'from-red-400 to-red-500' },
-    { name: 'Eatsure', color: 'from-yellow-400 to-yellow-500' },
-    { name: 'Maginpin', color: 'from-green-400 to-green-500' },
+    { name: 'Swiggy', color: 'from-orange-400 to-orange-500', url: 'https://www.swiggy.com' },
+    { name: 'Zomato', color: 'from-red-400 to-red-500', url: 'https://www.zomato.com' },
+    { name: 'Eatsure', color: 'from-yellow-400 to-yellow-500', url: 'https://www.eatsure.com' },
+    { name: 'Maginpin', color: 'from-green-400 to-green-500', url: 'https://www.maginpin.com' },
+  ];
+
+  const restaurants = [
+    'Paradise Biryani',
+    'Burger King',
+    'Dominos Pizza',
+    'Sushi Station',
+    'Spice Kitchen',
+    'The Dosa House',
+    'BBQ Delight',
+    'Bread Basket',
   ];
 
   const handleViewOptions = (product: Product) => {
@@ -60,12 +73,25 @@ export default function SearchPage() {
       discount: Math.floor(Math.random() * 200),
       eta: Math.floor(Math.random() * 30) + 15,
     }));
-    setPlatformPrices(
-      mockPlatformPrices.sort(
-        (a, b) => a.price + a.deliveryFee - b.price - b.deliveryFee
-      )
-    );
+    
+    let sorted = [...mockPlatformPrices];
+    if (sortBy === 'fastest') {
+      sorted.sort((a, b) => a.eta - b.eta);
+    } else if (sortBy === 'price') {
+      sorted.sort((a, b) => a.price + a.deliveryFee - b.price - b.deliveryFee);
+    } else {
+      sorted.sort((a, b) => a.price + a.deliveryFee - b.price - b.deliveryFee);
+    }
+    
+    setPlatformPrices(sorted);
     setIsModalOpen(true);
+  };
+
+  const handleOrderPlatform = (platformName: string) => {
+    const platform = platforms.find(p => p.name === platformName);
+    if (platform) {
+      window.open(platform.url, '_blank');
+    }
   };
 
   const handleSearch = async (searchTerm?: string) => {
@@ -88,6 +114,7 @@ export default function SearchPage() {
       const mockResults: Product[] = filtered.map((item, idx) => ({
         id: idx,
         name: item,
+        restaurant: restaurants[idx % restaurants.length],
         description: `Delicious ${item} available on multiple platforms`,
         price: Math.floor(Math.random() * 400) + 150,
         rating: Math.random() * 2 + 3,
@@ -174,6 +201,55 @@ export default function SearchPage() {
             </div>
           </motion.div>
 
+          {/* Filter Options */}
+          {results.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="max-w-2xl mx-auto mb-8"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-gray-700 font-semibold">Sort by:</span>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setSortBy('default')}
+                  className={`px-4 py-2 rounded-full font-semibold transition-all ${
+                    sortBy === 'default'
+                      ? 'bg-gradient-to-r from-amber-600 to-pink-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  Default
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setSortBy('fastest')}
+                  className={`px-4 py-2 rounded-full font-semibold transition-all ${
+                    sortBy === 'fastest'
+                      ? 'bg-gradient-to-r from-amber-600 to-pink-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  ⚡ Fastest Delivery
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setSortBy('price')}
+                  className={`px-4 py-2 rounded-full font-semibold transition-all ${
+                    sortBy === 'price'
+                      ? 'bg-gradient-to-r from-amber-600 to-pink-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  💰 Lowest Price
+                </motion.button>
+              </div>
+            </motion.div>
+          )}
+
           {/* Popular Items */}
           {results.length === 0 && !loading && query === '' && (
             <motion.div
@@ -240,6 +316,9 @@ export default function SearchPage() {
                   whileHover={{ scale: 1.05 }}
                   className="bg-white rounded-xl p-6 border-2 border-amber-100 hover:border-amber-600 transition-all shadow-md"
                 >
+                  <div className="mb-3">
+                    <p className="text-sm font-semibold text-amber-600">🏪 {product.restaurant}</p>
+                  </div>
                   <div className="flex items-start justify-between mb-4">
                     <h3 className="font-bold text-gray-900 text-lg flex-1">
                       {product.name}
@@ -313,6 +392,7 @@ export default function SearchPage() {
                   {/* Modal Header */}
                   <div className="flex items-start justify-between mb-6">
                     <div className="flex-1">
+                      <p className="text-sm font-semibold text-amber-600 mb-2">🏪 {selectedProduct.restaurant}</p>
                       <h2 className="text-3xl font-bold text-gray-900 mb-2">
                         {selectedProduct.name}
                       </h2>
@@ -398,6 +478,7 @@ export default function SearchPage() {
 
                           {/* Order Button */}
                           <motion.button
+                            onClick={() => handleOrderPlatform(item.platform)}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             className="w-full py-3 bg-gradient-to-r from-amber-600 to-pink-600 text-white font-bold rounded-lg hover:shadow-lg transition-shadow"
