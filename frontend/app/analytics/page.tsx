@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/authContext';
 import { ProtectedRoute } from '@/lib/ProtectedRoute';
+import { API_BASE_URL } from '@/lib/api';
 import { motion } from 'framer-motion';
 
 interface OrderStats {
@@ -13,7 +14,7 @@ interface OrderStats {
 }
 
 export default function AnalyticsPage() {
-  const { user } = useAuth();
+  useAuth();
   const [stats, setStats] = useState<OrderStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -27,18 +28,35 @@ export default function AnalyticsPage() {
       setLoading(true);
       const token = localStorage.getItem('authToken');
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/orders/user/stats`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/api/orders/user/stats`, {
+        credentials: 'include',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.ok) {
         const data = await response.json();
-        setStats(data.data);
+        const rawStats = data.stats || data.data;
+        if (!rawStats) {
+          setStats(null);
+          return;
+        }
+
+        const byStatusArray = Array.isArray(rawStats.byStatus) ? rawStats.byStatus : [];
+        const byStatusRecord = byStatusArray.reduce((acc: Record<string, number>, row: any) => {
+          const key = row.status || 'unknown';
+          const count = Number(row.count || 0);
+          acc[key] = count;
+          return acc;
+        }, {});
+
+        setStats({
+          totalOrders: Number(rawStats.totalOrders || 0),
+          totalSpent: Number(rawStats.totalSpent || 0),
+          totalSaved: Number(rawStats.totalSaved || 0),
+          byStatus: byStatusRecord,
+        });
       }
     } catch (err: any) {
       setError(err.message);
@@ -136,7 +154,7 @@ export default function AnalyticsPage() {
                 <p className="text-sm font-semibold opacity-90">Total Spent</p>
                 <p className="text-4xl font-bold mt-2">₹{stats.totalSpent}</p>
                 <p className="text-xs opacity-75 mt-2">
-                  ₹{Math.round(stats.totalSpent / stats.totalOrders)}/order avg
+                  ₹{stats.totalOrders > 0 ? Math.round(stats.totalSpent / stats.totalOrders) : 0}/order avg
                 </p>
               </motion.div>
 
@@ -310,3 +328,4 @@ export default function AnalyticsPage() {
     </ProtectedRoute>
   );
 }
+

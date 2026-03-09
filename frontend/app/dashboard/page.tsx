@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/authContext';
 import { ProtectedRoute } from '@/lib/ProtectedRoute';
+import { API_BASE_URL } from '@/lib/api';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
@@ -42,8 +43,9 @@ export default function DashboardPage() {
 
       // Fetch order stats
       const statsResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/orders/user/stats`,
+        `${API_BASE_URL}/api/orders/user/stats`,
         {
+          credentials: 'include',
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -52,13 +54,14 @@ export default function DashboardPage() {
 
       if (statsResponse.ok) {
         const statsData = await statsResponse.json();
-        setStats(statsData.data);
+        setStats(statsData.stats || statsData.data || null);
       }
 
       // Fetch recent orders
       const ordersResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/orders/user/history?limit=5`,
+        `${API_BASE_URL}/api/orders/user/history?limit=5`,
         {
+          credentials: 'include',
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -67,7 +70,7 @@ export default function DashboardPage() {
 
       if (ordersResponse.ok) {
         const ordersData = await ordersResponse.json();
-        setRecentOrders(ordersData.data || []);
+        setRecentOrders(ordersData.orders || ordersData.data || []);
       }
     } catch (err: any) {
       setError(err.message);
@@ -107,9 +110,9 @@ export default function DashboardPage() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
+          className="mb-8 md:mb-12"
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-2">
             Welcome back, <span className="bg-gradient-to-r from-amber-600 to-pink-600 bg-clip-text text-transparent">{user?.firstName}!</span>
           </h1>
           <p className="text-gray-600 text-lg">
@@ -223,8 +226,8 @@ export default function DashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-xl shadow-lg p-6 md:p-8"
         >
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Recent Orders</h2>
+          <div className="flex flex-wrap justify-between items-center gap-2 mb-6">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900">Recent Orders</h2>
             <Link href="/orders" className="text-amber-600 font-semibold hover:text-amber-700 transition">
               View All →
             </Link>
@@ -242,7 +245,7 @@ export default function DashboardPage() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-amber-300 hover:bg-amber-50 transition"
+                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 border border-gray-200 rounded-lg hover:border-amber-300 hover:bg-amber-50 transition"
                 >
                   <div className="flex-1">
                     <p className="font-semibold text-gray-900">
@@ -252,7 +255,7 @@ export default function DashboardPage() {
                       {new Date(order.createdAt).toLocaleDateString()}
                     </p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-left sm:text-right">
                     <p className="font-bold text-gray-900">₹{order.totalPrice}</p>
                     <motion.span
                       whileHover={{ scale: 1.05 }}

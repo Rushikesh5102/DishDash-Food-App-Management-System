@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/authContext';
 import { ProtectedRoute } from '@/lib/ProtectedRoute';
+import { API_BASE_URL } from '@/lib/api';
 import { motion } from 'framer-motion';
 
 interface Notification {
@@ -10,7 +11,7 @@ interface Notification {
   userId: number;
   title: string;
   message: string;
-  type: 'order' | 'promo' | 'system' | 'delivery';
+  type: string;
   isRead: boolean;
   actionUrl?: string;
   icon?: string;
@@ -18,7 +19,7 @@ interface Notification {
 }
 
 export default function NotificationsPage() {
-  const { user } = useAuth();
+  useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -35,8 +36,9 @@ export default function NotificationsPage() {
       const query = filterType !== 'all' ? `?type=${filterType}` : '';
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/notifications${query}`,
+        `${API_BASE_URL}/api/notifications${query}`,
         {
+          credentials: 'include',
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -45,7 +47,12 @@ export default function NotificationsPage() {
 
       if (response.ok) {
         const data = await response.json();
-        setNotifications(data.data || []);
+        const apiNotifications = data.notifications || data.data || [];
+        const normalized = apiNotifications.map((notification: any) => ({
+          ...notification,
+          type: notification.type || notification.notificationType || 'system',
+        }));
+        setNotifications(normalized);
       }
     } catch (err: any) {
       setError(err.message);
@@ -59,9 +66,10 @@ export default function NotificationsPage() {
       const token = localStorage.getItem('authToken');
 
       await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/notifications/${notificationId}/read`,
+        `${API_BASE_URL}/api/notifications/${notificationId}/read`,
         {
           method: 'PUT',
+          credentials: 'include',
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -83,9 +91,10 @@ export default function NotificationsPage() {
       const token = localStorage.getItem('authToken');
 
       await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/notifications/read-all`,
+        `${API_BASE_URL}/api/notifications/read-all`,
         {
           method: 'PUT',
+          credentials: 'include',
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -103,9 +112,10 @@ export default function NotificationsPage() {
       const token = localStorage.getItem('authToken');
 
       await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/notifications/${notificationId}`,
+        `${API_BASE_URL}/api/notifications/${notificationId}`,
         {
           method: 'DELETE',
+          credentials: 'include',
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -119,19 +129,29 @@ export default function NotificationsPage() {
   };
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
+  const visibleNotifications =
+    filterType === 'all'
+      ? notifications
+      : notifications.filter((notification) => notification.type === filterType);
 
   const typeIconMap: Record<string, string> = {
-    order: '📦',
-    promo: '🎉',
-    system: '⚙️',
-    delivery: '🚚',
+    order: '[ORD]',
+    promo: '[PROMO]',
+    promotion: '[PROMO]',
+    system: '[SYS]',
+    delivery: '[ETA]',
+    review: '[REVIEW]',
+    general: '[INFO]',
   };
 
   const typeColorMap: Record<string, string> = {
     order: 'bg-blue-50 border-blue-200',
     promo: 'bg-pink-50 border-pink-200',
+    promotion: 'bg-pink-50 border-pink-200',
     system: 'bg-gray-50 border-gray-200',
     delivery: 'bg-green-50 border-green-200',
+    review: 'bg-amber-50 border-amber-200',
+    general: 'bg-gray-50 border-gray-200',
   };
 
   return (
@@ -145,7 +165,7 @@ export default function NotificationsPage() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex justify-between items-start mb-8"
+          className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-8"
         >
           <div>
             <h1 className="text-4xl font-bold text-gray-900 mb-2">🔔 Notifications</h1>
@@ -204,8 +224,8 @@ export default function NotificationsPage() {
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
               {error}
             </div>
-          ) : notifications.length > 0 ? (
-            notifications.map((notification, index) => (
+          ) : visibleNotifications.length > 0 ? (
+            visibleNotifications.map((notification, index) => (
               <motion.div
                 key={notification.id}
                 initial={{ opacity: 0, x: -20 }}
@@ -277,3 +297,4 @@ export default function NotificationsPage() {
     </ProtectedRoute>
   );
 }
+

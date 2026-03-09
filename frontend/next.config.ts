@@ -1,21 +1,27 @@
 import type { NextConfig } from "next";
 
+const apiBaseUrl =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "";
+const isDevelopment = process.env.NODE_ENV === "development";
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  // Allow requests to localhost backend during development
+  // Only proxy local API requests during development.
   async rewrites() {
-    return {
-      fallback: [
-        {
-          source: '/api/:path*',
-          destination: 'http://localhost:5000/api/:path*',
-        },
-      ],
-    };
+    if (!isDevelopment) {
+      return [];
+    }
+
+    return [
+      {
+        source: "/api/:path*",
+        destination: "http://localhost:5000/api/:path*",
+      },
+    ];
   },
-  // Ensure environment variables are available
+  // Expose API base URL to client bundle.
   env: {
-    NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000',
+    NEXT_PUBLIC_API_BASE_URL: apiBaseUrl,
   },
 };
 

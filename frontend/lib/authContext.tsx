@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
+import { API_BASE_URL } from './api';
 
 interface User {
   id: number;
@@ -44,6 +45,8 @@ interface SignupData {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const buildAuthUrl = (path: string) => `${API_BASE_URL}${path}`;
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
@@ -64,7 +67,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const getCurrentUser = useCallback(async (authToken: string) => {
     try {
-      const response = await fetch('/api/auth/me', {
+      const response = await fetch(buildAuthUrl('/api/auth/me'), {
+        credentials: 'include',
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -90,8 +94,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('/api/auth/signup', {
+      const response = await fetch(buildAuthUrl('/api/auth/signup'), {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
@@ -117,8 +122,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(buildAuthUrl('/api/auth/login'), {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
@@ -143,8 +149,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(async () => {
     setLoading(true);
     try {
-      await fetch('/api/auth/logout', {
+      await fetch(buildAuthUrl('/api/auth/logout'), {
         method: 'POST',
+        credentials: 'include',
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -164,8 +171,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch('/api/auth/profile', {
+        const response = await fetch(buildAuthUrl('/api/auth/profile'), {
           method: 'PUT',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,

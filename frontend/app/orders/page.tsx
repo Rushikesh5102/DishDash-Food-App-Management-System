@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/authContext';
 import { ProtectedRoute } from '@/lib/ProtectedRoute';
+import { API_BASE_URL } from '@/lib/api';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 
 interface Order {
@@ -19,7 +21,7 @@ interface Order {
 }
 
 export default function OrdersPage() {
-  const { user } = useAuth();
+  useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -34,11 +36,17 @@ export default function OrdersPage() {
     try {
       setLoading(true);
       const token = localStorage.getItem('authToken');
-      const query = filter !== 'all' ? `?status=${filter}&page=${page}` : `?page=${page}`;
+      const limit = 10;
+      const offset = (page - 1) * limit;
+      const query =
+        filter !== 'all'
+          ? `?status=${filter}&limit=${limit}&offset=${offset}`
+          : `?limit=${limit}&offset=${offset}`;
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/orders/user/history${query}`,
+        `${API_BASE_URL}/api/orders/user/history${query}`,
         {
+          credentials: 'include',
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -47,7 +55,7 @@ export default function OrdersPage() {
 
       if (response.ok) {
         const data = await response.json();
-        setOrders(data.data || []);
+        setOrders(data.orders || data.data || []);
       }
     } catch (err: any) {
       setError(err.message);
@@ -76,7 +84,7 @@ export default function OrdersPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">My Orders</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">My Orders</h1>
           <p className="text-gray-600">Track all your food orders</p>
         </motion.div>
 
@@ -220,13 +228,12 @@ export default function OrdersPage() {
             >
               <p className="text-3xl mb-4">🛒</p>
               <p className="text-gray-600 text-lg mb-6">No orders found</p>
-              <motion.a
-                whileHover={{ scale: 1.05 }}
+              <Link
                 href="/search"
                 className="inline-block bg-gradient-to-r from-amber-600 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition"
               >
                 Order Now
-              </motion.a>
+              </Link>
             </motion.div>
           )}
         </motion.div>

@@ -28,6 +28,7 @@ router.put('/:notificationId/read', markAsRead);
 
 // Mark all as read
 router.put('/read/all', markAllAsRead);
+router.put('/read-all', markAllAsRead);
 
 // Delete notification
 router.delete('/:notificationId', deleteNotification);

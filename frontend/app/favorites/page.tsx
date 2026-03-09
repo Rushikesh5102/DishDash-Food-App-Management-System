@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/authContext';
 import { ProtectedRoute } from '@/lib/ProtectedRoute';
+import { API_BASE_URL } from '@/lib/api';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
@@ -17,7 +18,7 @@ interface Favorite {
 }
 
 export default function FavoritesPage() {
-  const { user } = useAuth();
+  useAuth();
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -31,18 +32,16 @@ export default function FavoritesPage() {
       setLoading(true);
       const token = localStorage.getItem('authToken');
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/favorites`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/api/favorites`, {
+        credentials: 'include',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.ok) {
         const data = await response.json();
-        setFavorites(data.data || []);
+        setFavorites(data.favorites || data.data || []);
       }
     } catch (err: any) {
       setError(err.message);
@@ -55,15 +54,13 @@ export default function FavoritesPage() {
     try {
       const token = localStorage.getItem('authToken');
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/favorites/${favoriteId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/api/favorites/${favoriteId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.ok) {
         setFavorites(favorites.filter((fav) => fav.id !== favoriteId));
@@ -179,13 +176,11 @@ export default function FavoritesPage() {
               <p className="text-3xl mb-4">🥳</p>
               <p className="text-gray-600 text-lg mb-2">No favorites yet</p>
               <p className="text-gray-500 mb-6">Start adding your favorite dishes to quickly compare prices</p>
-              <Link href="/search">
-                <motion.a
-                  whileHover={{ scale: 1.05 }}
-                  className="inline-block bg-gradient-to-r from-amber-600 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition"
-                >
-                  Explore Foods
-                </motion.a>
+              <Link
+                href="/search"
+                className="inline-block bg-gradient-to-r from-amber-600 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition"
+              >
+                Explore Foods
               </Link>
             </motion.div>
           )}

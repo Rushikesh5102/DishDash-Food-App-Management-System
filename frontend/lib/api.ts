@@ -3,7 +3,10 @@
  * Centralized location for all API calls
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000';
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  '';
 const API_TIMEOUT = parseInt(process.env.NEXT_PUBLIC_API_TIMEOUT || '10000');
 
 export const API_ENDPOINTS = {
@@ -36,6 +39,7 @@ export async function apiFetch(
     const response = await fetch(url, {
       ...fetchOptions,
       signal: controller.signal,
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
         ...fetchOptions.headers,
@@ -45,11 +49,13 @@ export async function apiFetch(
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.message || `API Error: ${response.status}`);
     }
-
-    return await response.json();
+    if (response.status === 204) {
+      return null;
+    }
+    return await response.json().catch(() => null);
   } catch (error: any) {
     if (error.name === 'AbortError') {
       throw new Error(`Request timeout after ${timeout}ms`);
