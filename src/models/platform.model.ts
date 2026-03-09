@@ -1,4 +1,4 @@
-import { Model, DataTypes } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/db';
 
 class Platform extends Model {
@@ -15,18 +15,15 @@ Platform.init(
       autoIncrement: true,
       primaryKey: true,
     },
-
     name: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
     },
-
     logoUrl: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-
     serviceArea: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -35,7 +32,7 @@ Platform.init(
   {
     sequelize,
     tableName: 'platforms',
-    timestamps: false,
+    timestamps: true,
   }
 );
 

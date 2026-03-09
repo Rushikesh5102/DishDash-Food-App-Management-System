@@ -1,4 +1,4 @@
-import { Model, DataTypes } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/db';
 
 class Product extends Model {
@@ -16,22 +16,19 @@ Product.init(
       autoIncrement: true,
       primaryKey: true,
     },
-
     restaurantId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-
     name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-
     category: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
+      defaultValue: '',
     },
-
     imageUrl: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -40,7 +37,8 @@ Product.init(
   {
     sequelize,
     tableName: 'products',
-    timestamps: false,
+    timestamps: true,
+    updatedAt: false,
   }
 );
 

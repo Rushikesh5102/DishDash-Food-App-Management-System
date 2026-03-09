@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
 import { API_BASE_URL } from './api';
+import { getErrorMessage, readResponseBody } from './http';
 
 interface User {
   id: number;
@@ -74,9 +75,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
       });
 
+      const body = await readResponseBody(response);
+
       if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
+        setUser(body?.user || null);
       } else {
         localStorage.removeItem('authToken');
         setToken(null);
@@ -101,12 +103,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify(data),
       });
 
+      const body = await readResponseBody(response);
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Signup failed');
+        throw new Error(getErrorMessage(body, response.status));
       }
 
-      const result = await response.json();
+      const result = body;
       setToken(result.token);
       setUser(result.user);
       localStorage.setItem('authToken', result.token);
@@ -129,12 +132,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({ email, password }),
       });
 
+      const body = await readResponseBody(response);
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
+        throw new Error(getErrorMessage(body, response.status));
       }
 
-      const result = await response.json();
+      const result = body;
       setToken(result.token);
       setUser(result.user);
       localStorage.setItem('authToken', result.token);
@@ -181,11 +185,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           body: JSON.stringify(data),
         });
 
+        const body = await readResponseBody(response);
+
         if (!response.ok) {
-          throw new Error('Failed to update profile');
+          throw new Error(getErrorMessage(body, response.status));
         }
 
-        const result = await response.json();
+        const result = body;
         setUser(result.user);
       } catch (err: any) {
         setError(err.message);

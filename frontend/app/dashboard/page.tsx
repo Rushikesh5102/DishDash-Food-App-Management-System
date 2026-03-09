@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/authContext';
 import { ProtectedRoute } from '@/lib/ProtectedRoute';
 import { API_BASE_URL } from '@/lib/api';
+import { getErrorMessage, readResponseBody } from '@/lib/http';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
@@ -52,10 +53,11 @@ export default function DashboardPage() {
         }
       );
 
-      if (statsResponse.ok) {
-        const statsData = await statsResponse.json();
-        setStats(statsData.stats || statsData.data || null);
+      const statsBody = await readResponseBody(statsResponse);
+      if (!statsResponse.ok) {
+        throw new Error(getErrorMessage(statsBody, statsResponse.status));
       }
+      setStats(statsBody?.stats || statsBody?.data || null);
 
       // Fetch recent orders
       const ordersResponse = await fetch(
@@ -68,10 +70,11 @@ export default function DashboardPage() {
         }
       );
 
-      if (ordersResponse.ok) {
-        const ordersData = await ordersResponse.json();
-        setRecentOrders(ordersData.orders || ordersData.data || []);
+      const ordersBody = await readResponseBody(ordersResponse);
+      if (!ordersResponse.ok) {
+        throw new Error(getErrorMessage(ordersBody, ordersResponse.status));
       }
+      setRecentOrders(ordersBody?.orders || ordersBody?.data || []);
     } catch (err: any) {
       setError(err.message);
     } finally {

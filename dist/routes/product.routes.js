@@ -43,8 +43,6 @@ const router = (0, express_1.Router)();
 router.post('/', productController.createProduct);
 // Get all products
 router.get('/', productController.getProducts);
-// Get single product
-router.get('/:id', productController.getProductById);
 /* ===========================
    PLATFORM LISTINGS
 =========================== */
@@ -53,6 +51,10 @@ router.post('/listing', productController.addPlatformListing);
 /* ===========================
    COMPARE PRODUCT
 =========================== */
-// Compare product prices
+// Compare product prices by product name
 router.get('/compare/search', productController.compareSearch);
+// Compare all products by restaurant
+router.get('/restaurant/:restaurantId/compare', productController.compareByRestaurant);
+// Get single product
+router.get('/:id', productController.getProductById);
 exports.default = router;

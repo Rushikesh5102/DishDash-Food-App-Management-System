@@ -1,18 +1,18 @@
 import Product from '../models/product.model';
 
-export const createProduct = async (productData: { product_name: string; category: string; }): Promise<Product> => {
+export const createProduct = async (productData: { name: string; category: string; restaurantId: number; imageUrl?: string | null; }) => {
   return await Product.create(productData);
 };
 
-export const getProducts = async (): Promise<Product[]> => {
+export const getProducts = async () => {
   return await Product.findAll();
 };
 
-export const getProductById = async (id: number): Promise<Product | null> => {
+export const getProductById = async (id: number) => {
   return await Product.findByPk(id);
 };
 
-export const updateProduct = async (id: number, productData: Partial<{ product_name: string; category: string; }>): Promise<Product | null> => {
+export const updateProduct = async (id: number, productData: Partial<{ name: string; category: string; imageUrl: string; restaurantId: number; }>) => {
   const [affectedCount] = await Product.update(productData, {
     where: { id },
   });

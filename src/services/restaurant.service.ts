@@ -1,55 +1,69 @@
-import { Restaurant, MenuItem } from '../models/restaurant.model';
+import { MenuItem, Restaurant } from '../models/restaurant.model';
 
-export const createRestaurant = async (restaurantData: { name: string; address: string; cuisine: string; }): Promise<Restaurant> => {
-    return await Restaurant.create(restaurantData);
+export const createRestaurant = async (restaurantData: { name: string; address: string; cuisine: string; }) => {
+  return Restaurant.create({
+    name: restaurantData.name,
+    location: restaurantData.address,
+    cuisineType: restaurantData.cuisine,
+  } as any);
 };
 
-export const getRestaurants = async (): Promise<Restaurant[]> => {
-    return await Restaurant.findAll({ include: [MenuItem] });
+export const getRestaurants = async () => {
+  return Restaurant.findAll({
+    include: [MenuItem],
+    order: [['createdAt', 'DESC']],
+  });
 };
 
-export const getRestaurantById = async (id: number): Promise<Restaurant | null> => {
-    return await Restaurant.findByPk(id, { include: [MenuItem] });
+export const getRestaurantById = async (id: string) => {
+  return Restaurant.findByPk(Number(id), { include: [MenuItem] });
 };
 
-export const updateRestaurant = async (id: number, restaurantData: Partial<{ name: string; address: string; cuisine: string; }>): Promise<Restaurant | null> => {
-    const [affectedCount] = await Restaurant.update(restaurantData, {
-        where: { id },
-    });
+export const updateRestaurant = async (id: string, restaurantData: Partial<{ name: string; address: string; cuisine: string; }>) => {
+  const updatePayload: Record<string, unknown> = {};
+  if (restaurantData.name !== undefined) updatePayload.name = restaurantData.name;
+  if (restaurantData.address !== undefined) updatePayload.location = restaurantData.address;
+  if (restaurantData.cuisine !== undefined) updatePayload.cuisineType = restaurantData.cuisine;
 
-    if (affectedCount > 0) {
-        return await Restaurant.findByPk(id, { include: [MenuItem] });
-    }
+  const [affectedCount] = await Restaurant.update(updatePayload, { where: { id: Number(id) } });
+  if (affectedCount > 0) {
+    return Restaurant.findByPk(Number(id), { include: [MenuItem] });
+  }
+  return null;
+};
+
+export const deleteRestaurant = async (id: string): Promise<number> => {
+  return Restaurant.destroy({ where: { id: Number(id) } });
+};
+
+export const addMenuItem = async (restaurantId: string, menuItem: { name: string; description: string; price: number; category: string; }) => {
+  const restaurant = await Restaurant.findByPk(Number(restaurantId));
+  if (!restaurant) {
     return null;
+  }
+
+  return MenuItem.create({
+    ...menuItem,
+    restaurantId: Number(restaurantId),
+  });
 };
 
-export const deleteRestaurant = async (id: number): Promise<number> => {
-    return await Restaurant.destroy({
-        where: { id },
-    });
+export const updateMenuItem = async (
+  restaurantId: string,
+  menuItemId: string,
+  menuItemData: Partial<{ name: string; description: string; price: number; category: string; }>
+) => {
+  const [affectedCount] = await MenuItem.update(menuItemData, {
+    where: { id: Number(menuItemId), restaurantId: Number(restaurantId) },
+  });
+  if (affectedCount > 0) {
+    return MenuItem.findByPk(Number(menuItemId));
+  }
+  return null;
 };
 
-export const addMenuItem = async (restaurantId: number, menuItem: { name: string; description: string; price: number; category: string; }): Promise<MenuItem | null> => {
-    const restaurant = await Restaurant.findByPk(restaurantId);
-    if (restaurant) {
-        return await MenuItem.create({ ...menuItem, restaurantId });
-    }
-    return null;
-};
-
-export const updateMenuItem = async (restaurantId: number, menuItemId: number, menuItemData: Partial<{ name: string; description: string; price: number; category: string; }>): Promise<MenuItem | null> => {
-    const [affectedCount] = await MenuItem.update(menuItemData, {
-        where: { id: menuItemId, restaurantId },
-    });
-
-    if (affectedCount > 0) {
-        return await MenuItem.findByPk(menuItemId);
-    }
-    return null;
-};
-
-export const deleteMenuItem = async (restaurantId: number, menuItemId: number): Promise<number> => {
-    return await MenuItem.destroy({
-        where: { id: menuItemId, restaurantId },
-    });
+export const deleteMenuItem = async (restaurantId: string, menuItemId: string) => {
+  return MenuItem.destroy({
+    where: { id: Number(menuItemId), restaurantId: Number(restaurantId) },
+  });
 };

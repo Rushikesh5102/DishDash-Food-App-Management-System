@@ -10,11 +10,15 @@ Product.init({
         autoIncrement: true,
         primaryKey: true,
     },
+    restaurantId: {
+        type: sequelize_1.DataTypes.INTEGER,
+        allowNull: false,
+    },
     name: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
     },
-    description: {
+    category: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: true,
     },

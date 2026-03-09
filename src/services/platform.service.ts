@@ -1,30 +1,25 @@
 import Platform from '../models/platform.model';
 
-export const createPlatform = async (platformData: { platform_name: string; service_area: string; }): Promise<Platform> => {
-  return await Platform.create(platformData);
+export const createPlatform = async (platformData: { name: string; logoUrl?: string; serviceArea: string; }) => {
+  return Platform.create(platformData);
 };
 
-export const getPlatforms = async (): Promise<Platform[]> => {
-  return await Platform.findAll();
+export const getPlatforms = async () => {
+  return Platform.findAll({ order: [['createdAt', 'DESC']] });
 };
 
-export const getPlatformById = async (id: number): Promise<Platform | null> => {
-  return await Platform.findByPk(id);
+export const getPlatformById = async (id: string) => {
+  return Platform.findByPk(Number(id));
 };
 
-export const updatePlatform = async (id: number, platformData: Partial<{ platform_name: string; service_area: string; }>): Promise<Platform | null> => {
-  const [affectedCount] = await Platform.update(platformData, {
-    where: { id },
-  });
-
+export const updatePlatform = async (id: string, platformData: Partial<{ name: string; logoUrl: string; serviceArea: string; }>) => {
+  const [affectedCount] = await Platform.update(platformData, { where: { id: Number(id) } });
   if (affectedCount > 0) {
-    return await Platform.findByPk(id);
+    return Platform.findByPk(Number(id));
   }
   return null;
 };
 
-export const deletePlatform = async (id: number): Promise<number> => {
-  return await Platform.destroy({
-    where: { id },
-  });
+export const deletePlatform = async (id: string): Promise<number> => {
+  return Platform.destroy({ where: { id: Number(id) } });
 };

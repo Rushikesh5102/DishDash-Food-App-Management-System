@@ -1,59 +1,23 @@
-import { Model, DataTypes, Optional } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/db';
-import User from './user.model';
-import { Restaurant } from './restaurant.model';
 
-/* ===========================
-   ORDER MODEL (Enhanced)
-=========================== */
-
-interface OrderAttributes {
-  id: number;
-  userId: number;
-  productId?: number;
-  platformId?: number;
-  restaurantId?: number;
-  platformName?: string;
-  restaurantName?: string;
-  productName?: string;
-  price?: number;
-  deliveryFee?: number;
-  totalPrice: number;
-  discount?: number;
-  status: 'pending' | 'confirmed' | 'delivered' | 'cancelled';
-  orderDate?: Date;
-  deliveryDate?: Date;
-  notes?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-interface OrderCreationAttributes
-  extends Optional<OrderAttributes, 'id' | 'status'> {}
-
-class Order
-  extends Model<OrderAttributes, OrderCreationAttributes>
-  implements OrderAttributes
-{
+class Order extends Model {
   public id!: number;
   public userId!: number;
   public productId?: number;
   public platformId?: number;
   public restaurantId?: number;
-  public platformName?: string;
-  public restaurantName?: string;
-  public productName?: string;
-  public price?: number;
-  public deliveryFee?: number;
+  public platformName!: string;
+  public restaurantName!: string;
+  public productName!: string;
+  public price!: number;
+  public deliveryFee!: number;
   public totalPrice!: number;
-  public discount?: number;
+  public discount!: number;
   public status!: 'pending' | 'confirmed' | 'delivered' | 'cancelled';
-  public orderDate?: Date;
+  public orderDate!: Date;
   public deliveryDate?: Date;
-  public notes?: string;
-
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public notes!: string;
 }
 
 Order.init(
@@ -69,27 +33,40 @@ Order.init(
     },
     productId: {
       type: DataTypes.INTEGER,
+      allowNull: true,
     },
     platformId: {
       type: DataTypes.INTEGER,
+      allowNull: true,
     },
     restaurantId: {
       type: DataTypes.INTEGER,
+      allowNull: true,
     },
     platformName: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: '',
     },
     restaurantName: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: '',
     },
     productName: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: '',
     },
     price: {
       type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+      defaultValue: 0,
     },
     deliveryFee: {
       type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+      defaultValue: 0,
     },
     totalPrice: {
       type: DataTypes.DECIMAL(10, 2),
@@ -97,19 +74,27 @@ Order.init(
     },
     discount: {
       type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+      defaultValue: 0,
     },
     status: {
       type: DataTypes.ENUM('pending', 'confirmed', 'delivered', 'cancelled'),
+      allowNull: false,
       defaultValue: 'pending',
     },
     orderDate: {
       type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: DataTypes.NOW,
     },
     deliveryDate: {
       type: DataTypes.DATE,
+      allowNull: true,
     },
     notes: {
       type: DataTypes.TEXT,
+      allowNull: true,
+      defaultValue: '',
     },
   },
   {
@@ -119,101 +104,4 @@ Order.init(
   }
 );
 
-/* ===========================
-   ORDER ITEM MODEL
-=========================== */
-
-interface OrderItemAttributes {
-  id: number;
-  name: string;
-  quantity: number;
-  price: number;
-  orderId: number;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-interface OrderItemCreationAttributes
-  extends Optional<OrderItemAttributes, 'id'> {}
-
-class OrderItem
-  extends Model<OrderItemAttributes, OrderItemCreationAttributes>
-  implements OrderItemAttributes
-{
-  public id!: number;
-  public name!: string;
-  public quantity!: number;
-  public price!: number;
-  public orderId!: number;
-
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
-}
-
-OrderItem.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-    },
-
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-
-    quantity: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-
-    price: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: false,
-    },
-
-    orderId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-  },
-  {
-    sequelize,
-    tableName: 'order_items',
-    timestamps: true,
-  }
-);
-
-/* ===========================
-   ASSOCIATIONS
-=========================== */
-
-Order.belongsTo(User, {
-  foreignKey: 'userId',
-  onDelete: 'CASCADE',
-});
-
-User.hasMany(Order, {
-  foreignKey: 'userId',
-});
-
-Order.belongsTo(Restaurant, {
-  foreignKey: 'restaurantId',
-  onDelete: 'CASCADE',
-});
-
-Restaurant.hasMany(Order, {
-  foreignKey: 'restaurantId',
-});
-
-Order.hasMany(OrderItem, {
-  foreignKey: 'orderId',
-  onDelete: 'CASCADE',
-});
-
-OrderItem.belongsTo(Order, {
-  foreignKey: 'orderId',
-});
-
-export { Order, OrderItem };
+export { Order };

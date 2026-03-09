@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/authContext';
 import { ProtectedRoute } from '@/lib/ProtectedRoute';
 import { API_BASE_URL } from '@/lib/api';
+import { getErrorMessage, readResponseBody } from '@/lib/http';
 import { motion } from 'framer-motion';
 
 interface Notification {
@@ -45,15 +46,16 @@ export default function NotificationsPage() {
         }
       );
 
-      if (response.ok) {
-        const data = await response.json();
-        const apiNotifications = data.notifications || data.data || [];
-        const normalized = apiNotifications.map((notification: any) => ({
-          ...notification,
-          type: notification.type || notification.notificationType || 'system',
-        }));
-        setNotifications(normalized);
+      const body = await readResponseBody(response);
+      if (!response.ok) {
+        throw new Error(getErrorMessage(body, response.status));
       }
+      const apiNotifications = body?.notifications || body?.data || [];
+      const normalized = apiNotifications.map((notification: any) => ({
+        ...notification,
+        type: notification.type || notification.notificationType || 'system',
+      }));
+      setNotifications(normalized);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -65,7 +67,7 @@ export default function NotificationsPage() {
     try {
       const token = localStorage.getItem('authToken');
 
-      await fetch(
+      const response = await fetch(
         `${API_BASE_URL}/api/notifications/${notificationId}/read`,
         {
           method: 'PUT',
@@ -75,6 +77,11 @@ export default function NotificationsPage() {
           },
         }
       );
+
+      const body = await readResponseBody(response);
+      if (!response.ok) {
+        throw new Error(getErrorMessage(body, response.status));
+      }
 
       setNotifications(
         notifications.map((notif) =>
@@ -90,7 +97,7 @@ export default function NotificationsPage() {
     try {
       const token = localStorage.getItem('authToken');
 
-      await fetch(
+      const response = await fetch(
         `${API_BASE_URL}/api/notifications/read-all`,
         {
           method: 'PUT',
@@ -100,6 +107,11 @@ export default function NotificationsPage() {
           },
         }
       );
+
+      const body = await readResponseBody(response);
+      if (!response.ok) {
+        throw new Error(getErrorMessage(body, response.status));
+      }
 
       setNotifications(notifications.map((notif) => ({ ...notif, isRead: true })));
     } catch (err: any) {
@@ -111,7 +123,7 @@ export default function NotificationsPage() {
     try {
       const token = localStorage.getItem('authToken');
 
-      await fetch(
+      const response = await fetch(
         `${API_BASE_URL}/api/notifications/${notificationId}`,
         {
           method: 'DELETE',
@@ -121,6 +133,11 @@ export default function NotificationsPage() {
           },
         }
       );
+
+      const body = await readResponseBody(response);
+      if (!response.ok) {
+        throw new Error(getErrorMessage(body, response.status));
+      }
 
       setNotifications(notifications.filter((notif) => notif.id !== notificationId));
     } catch (err: any) {

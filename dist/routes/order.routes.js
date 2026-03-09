@@ -40,23 +40,29 @@ const express_1 = require("express");
 const orderController = __importStar(require("../controllers/order.controller"));
 const validation_middleware_1 = __importDefault(require("../middleware/validation.middleware"));
 const joi_1 = __importDefault(require("joi"));
+const authMiddleware_1 = require("../middleware/authMiddleware");
 const router = (0, express_1.Router)();
-const orderItemSchema = joi_1.default.object({
-    name: joi_1.default.string().required(),
-    quantity: joi_1.default.number().required(),
-    price: joi_1.default.number().required(),
-});
 const orderSchema = joi_1.default.object({
-    restaurantId: joi_1.default.number().required(),
-    userId: joi_1.default.number().optional(),
-    items: joi_1.default.array().items(orderItemSchema).required(),
+    productId: joi_1.default.number().required(),
+    platformId: joi_1.default.number().required(),
+    restaurantId: joi_1.default.number().optional(),
+    platformName: joi_1.default.string().optional(),
+    restaurantName: joi_1.default.string().optional(),
+    productName: joi_1.default.string().optional(),
+    price: joi_1.default.number().optional(),
+    deliveryFee: joi_1.default.number().optional(),
     totalPrice: joi_1.default.number().required(),
-    status: joi_1.default.string().optional(),
+    discount: joi_1.default.number().optional(),
+    notes: joi_1.default.string().allow('').optional(),
 });
 // GET all orders
 router.get('/', orderController.getOrders);
+// GET authenticated user's order history
+router.get('/user/history', authMiddleware_1.authMiddleware, orderController.getUserOrderHistory);
+// GET authenticated user's order statistics
+router.get('/user/stats', authMiddleware_1.authMiddleware, orderController.getOrderStats);
 // CREATE order
-router.post('/', (0, validation_middleware_1.default)(orderSchema), orderController.createOrder);
+router.post('/', authMiddleware_1.authMiddleware, (0, validation_middleware_1.default)(orderSchema), orderController.createOrder);
 // GET single order
 router.get('/:id', orderController.getOrderById);
 // UPDATE order status

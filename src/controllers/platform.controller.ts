@@ -10,7 +10,7 @@ export const createPlatform = async (req: Request, res: Response, next: NextFunc
   }
 };
 
-export const getPlatforms = async (req: Request, res: Response, next: NextFunction) => {
+export const getPlatforms = async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const platforms = await platformService.getPlatforms();
     res.json(platforms);
@@ -21,7 +21,7 @@ export const getPlatforms = async (req: Request, res: Response, next: NextFuncti
 
 export const getPlatformById = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const platform = await platformService.getPlatformById(parseInt(req.params.id));
+    const platform = await platformService.getPlatformById(req.params.id);
     if (platform) {
       res.json(platform);
     } else {
@@ -34,7 +34,7 @@ export const getPlatformById = async (req: Request, res: Response, next: NextFun
 
 export const updatePlatform = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const platform = await platformService.updatePlatform(parseInt(req.params.id), req.body);
+    const platform = await platformService.updatePlatform(req.params.id, req.body);
     if (platform) {
       res.json(platform);
     } else {
@@ -47,7 +47,7 @@ export const updatePlatform = async (req: Request, res: Response, next: NextFunc
 
 export const deletePlatform = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const deletedCount = await platformService.deletePlatform(parseInt(req.params.id));
+    const deletedCount = await platformService.deletePlatform(req.params.id);
     if (deletedCount > 0) {
       res.json({ message: 'Platform removed' });
     } else {

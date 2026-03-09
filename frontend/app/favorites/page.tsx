@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/authContext';
 import { ProtectedRoute } from '@/lib/ProtectedRoute';
 import { API_BASE_URL } from '@/lib/api';
+import { getErrorMessage, readResponseBody } from '@/lib/http';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
@@ -39,10 +40,11 @@ export default function FavoritesPage() {
         },
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setFavorites(data.favorites || data.data || []);
+      const body = await readResponseBody(response);
+      if (!response.ok) {
+        throw new Error(getErrorMessage(body, response.status));
       }
+      setFavorites(body?.favorites || body?.data || []);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -62,11 +64,13 @@ export default function FavoritesPage() {
         },
       });
 
-      if (response.ok) {
-        setFavorites(favorites.filter((fav) => fav.id !== favoriteId));
+      const body = await readResponseBody(response);
+      if (!response.ok) {
+        throw new Error(getErrorMessage(body, response.status));
       }
+      setFavorites(favorites.filter((fav) => fav.id !== favoriteId));
     } catch (err: any) {
-      console.error('Error removing favorite:', err);
+      setError(err.message || 'Error removing favorite');
     }
   };
 

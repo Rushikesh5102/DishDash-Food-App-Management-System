@@ -1,101 +1,44 @@
-import { Order, OrderItem } from '../models/order.model';
-import User from '../models/user.model';
+import { Order } from '../models/order.model';
+import Product from '../models/product.model';
+import Platform from '../models/platform.model';
 import { Restaurant } from '../models/restaurant.model';
+import User from '../models/user.model';
 
-/* ===========================
-   CREATE ORDER
-=========================== */
-
-export const createOrder = async (orderData: any): Promise<Order> => {
-  const { items, ...orderHeader } = orderData;
-
-  const order = await Order.create(orderHeader);
-
-  if (items && items.length > 0) {
-    const orderItems = items.map((item: any) => ({
-      ...item,
-      orderId: order.id,
-    }));
-
-    await OrderItem.bulkCreate(orderItems);
-  }
-
-  return (await Order.findByPk(order.id, {
-    include: [
-      { model: User, attributes: ['name'] },
-      { model: Restaurant, attributes: ['name'] },
-      { model: OrderItem },
-    ],
-  })) as Order;
+export const createOrder = async (orderData: any) => {
+  return Order.create(orderData);
 };
 
-/* ===========================
-   GET ALL ORDERS
-=========================== */
-
-export const getOrders = async (): Promise<Order[]> => {
-  return await Order.findAll({
-    include: [
-      { model: User, attributes: ['name'] },
-      { model: Restaurant, attributes: ['name'] },
-      { model: OrderItem },
-    ],
+export const getOrders = async () => {
+  return Order.findAll({
+    include: [User, Restaurant, Product, Platform],
+    order: [['orderDate', 'DESC']],
   });
 };
 
-/* ===========================
-   GET ORDER BY ID
-=========================== */
-
-export const getOrderById = async (id: number): Promise<Order | null> => {
-  return await Order.findByPk(id, {
-    include: [
-      { model: User, attributes: ['name'] },
-      { model: Restaurant, attributes: ['name'] },
-      { model: OrderItem },
-    ],
+export const getOrderById = async (id: string) => {
+  return Order.findByPk(Number(id), {
+    include: [User, Restaurant, Product, Platform],
   });
 };
-
-/* ===========================
-   UPDATE ORDER STATUS
-=========================== */
 
 export const updateOrderStatus = async (
-  id: number,
+  id: string,
   status: 'pending' | 'confirmed' | 'delivered' | 'cancelled'
-): Promise<Order | null> => {
-  const order = await Order.findByPk(id);
-
-  if (!order) return null;
+) => {
+  const order = await Order.findByPk(Number(id));
+  if (!order) {
+    return null;
+  }
 
   order.status = status;
   await order.save();
 
-  return await Order.findByPk(id, {
-    include: [
-      { model: User, attributes: ['name'] },
-      { model: Restaurant, attributes: ['name'] },
-      { model: OrderItem },
-    ],
+  return Order.findByPk(Number(id), {
+    include: [User, Restaurant, Product, Platform],
   });
 };
 
-/* ===========================
-   DELETE ORDER
-=========================== */
-
-export const deleteOrder = async (id: number): Promise<boolean> => {
-  const order = await Order.findByPk(id);
-
-  if (!order) return false;
-
-  // Delete related order items first (safe even if cascade exists)
-  await OrderItem.destroy({
-    where: { orderId: id },
-  });
-
-  await order.destroy();
-
-  return true;
+export const deleteOrder = async (id: string): Promise<boolean> => {
+  const deleted = await Order.destroy({ where: { id: Number(id) } });
+  return deleted > 0;
 };

@@ -1,0 +1,200 @@
+
+> frontend@0.1.0 dev
+> next dev
+
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of c:\Users\SAM\OneDrive\Documents\Desktop\DishDash-Food-App-Management-System\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * c:\Users\SAM\OneDrive\Documents\Desktop\DishDash-Food-App-Management-System\frontend\package-lock.json
+
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.10:3000
+
+✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+Creating turbopack project {
+  dir: 'c:\\Users\\SAM\\OneDrive\\Documents\\Desktop\\DishDash-Food-App-Management-System\\frontend',
+  testMode: true
+}
+✓ Ready in 3.1s
+○ Compiling / ...
+ HEAD / 200 in 86ms (compile: 28ms, render: 58ms)
+ GET / 200 in 177ms (compile: 23ms, render: 154ms)
+⨯ ./frontend/app/login/page.tsx:7:1
+Module not found: Can't resolve 'framer-motion'
+[0m [90m  5 |[39m [36mimport[39m { useAuth } [36mfrom[39m [32m'@/lib/authContext'[39m[33m;[39m
+ [90m  6 |[39m [36mimport[39m [33mLink[39m [36mfrom[39m [32m'next/link'[39m[33m;[39m
+[31m[1m>[22m[39m[90m  7 |[39m [36mimport[39m { motion } [36mfrom[39m [32m'framer-motion'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m  8 |[39m
+ [90m  9 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mLoginPage[39m() {
+ [90m 10 |[39m   [36mconst[39m [email[33m,[39m setEmail] [33m=[39m useState([32m''[39m)[33m;[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./frontend/app/login/page.tsx [Client Component Browser]
+    ./frontend/app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./frontend/app/login/page.tsx [Client Component SSR]
+    ./frontend/app/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ GET /login 500 in 5.4s (compile: 4.8s, render: 579ms)
+⨯ ./frontend/app/login/page.tsx:7:1
+Module not found: Can't resolve 'framer-motion'
+[0m [90m  5 |[39m [36mimport[39m { useAuth } [36mfrom[39m [32m'@/lib/authContext'[39m[33m;[39m
+ [90m  6 |[39m [36mimport[39m [33mLink[39m [36mfrom[39m [32m'next/link'[39m[33m;[39m
+[31m[1m>[22m[39m[90m  7 |[39m [36mimport[39m { motion } [36mfrom[39m [32m'framer-motion'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m  8 |[39m
+ [90m  9 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mLoginPage[39m() {
+ [90m 10 |[39m   [36mconst[39m [email[33m,[39m setEmail] [33m=[39m useState([32m''[39m)[33m;[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./frontend/app/login/page.tsx [Client Component Browser]
+    ./frontend/app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./frontend/app/login/page.tsx [Client Component SSR]
+    ./frontend/app/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ GET /login 500 in 83ms (compile: 51ms, render: 32ms)
+⨯ ./frontend/app/login/page.tsx:7:1
+Module not found: Can't resolve 'framer-motion'
+[0m [90m  5 |[39m [36mimport[39m { useAuth } [36mfrom[39m [32m'@/lib/authContext'[39m[33m;[39m
+ [90m  6 |[39m [36mimport[39m [33mLink[39m [36mfrom[39m [32m'next/link'[39m[33m;[39m
+[31m[1m>[22m[39m[90m  7 |[39m [36mimport[39m { motion } [36mfrom[39m [32m'framer-motion'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m  8 |[39m
+ [90m  9 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mLoginPage[39m() {
+ [90m 10 |[39m   [36mconst[39m [email[33m,[39m setEmail] [33m=[39m useState([32m''[39m)[33m;[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./frontend/app/login/page.tsx [Client Component Browser]
+    ./frontend/app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./frontend/app/login/page.tsx [Client Component SSR]
+    ./frontend/app/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ GET /login 500 in 131ms (compile: 88ms, render: 43ms)
+✓ Compiled in 1195ms
+ GET /login 200 in 1250ms (compile: 568ms, render: 682ms)
+(node:54384) [DEP0060] DeprecationWarning: The `util._extend` API is deprecated. Please use Object.assign() instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Failed to proxy http://localhost:5000/api/auth/login AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+ GET /signup 200 in 1714ms (compile: 1619ms, render: 95ms)
+ GET /signup 200 in 78ms (compile: 13ms, render: 65ms)
+Failed to proxy http://localhost:5000/api/auth/signup AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+ GET / 200 in 80ms (compile: 15ms, render: 65ms)
+ GET /login 200 in 136ms (compile: 17ms, render: 118ms)
+ GET /login 200 in 57ms (compile: 10ms, render: 48ms)
+Failed to proxy http://localhost:5000/api/auth/login AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+ GET /login 200 in 448ms (compile: 186ms, render: 262ms)
+Failed to proxy http://localhost:5000/api/auth/login AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+ GET /signup 200 in 70ms (compile: 33ms, render: 37ms)
+Failed to proxy http://localhost:5000/api/auth/signup AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+✓ Compiled in 1044ms
+ GET /signup 200 in 1356ms (compile: 704ms, render: 652ms)
+✓ Compiled in 416ms
+ GET /signup 200 in 287ms (compile: 103ms, render: 184ms)
+Failed to proxy http://localhost:5000/api/auth/signup AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+  Reload env: .env.local
+ GET /signup 200 in 3.0s (compile: 2.2s, render: 849ms)
+ GET / 200 in 1309ms (compile: 432ms, render: 878ms)
+ GET / 200 in 96ms (compile: 35ms, render: 61ms)
+ GET /login 200 in 649ms (compile: 543ms, render: 106ms)
+ GET /signup 200 in 48ms (compile: 18ms, render: 30ms)
+ GET /signup 200 in 163ms (compile: 6ms, render: 156ms)
+Failed to proxy http://localhost:5000/api/auth/signup AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+ GET /signup 200 in 154ms (compile: 48ms, render: 106ms)
+ GET /signup 200 in 99ms (compile: 18ms, render: 81ms)
+ GET / 200 in 116ms (compile: 25ms, render: 91ms)
+ GET /login 200 in 54ms (compile: 16ms, render: 38ms)
+ GET /signup 200 in 40ms (compile: 11ms, render: 29ms)
+○ Compiling /dashboard ...
+ GET /dashboard 200 in 5.1s (compile: 4.9s, render: 166ms)
+ GET /orders 200 in 879ms (compile: 831ms, render: 47ms)
+ GET /dashboard 200 in 68ms (compile: 26ms, render: 42ms)
+ GET /orders 200 in 91ms (compile: 33ms, render: 58ms)
+ GET /search 200 in 1023ms (compile: 977ms, render: 46ms)
+ GET /orders 200 in 30ms (compile: 8ms, render: 23ms)
+ GET /favorites 200 in 556ms (compile: 526ms, render: 30ms)
+ GET /dashboard 200 in 36ms (compile: 10ms, render: 26ms)
+ GET /search 200 in 42ms (compile: 9ms, render: 34ms)
+  Reload env: .env.local
+ GET /search 200 in 266ms (compile: 173ms, render: 94ms)
+^C^C

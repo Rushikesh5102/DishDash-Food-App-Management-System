@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node dist/server.js",
     "dev": "nodemon src/server.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "db:setup": "node setup-database-enhanced.js",
+    "db:test": "node test_db_conn.js"
   },
   "keywords": [],
   "author": "",
@@ -17,9 +19,10 @@
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^4.18.2",
+    "framer-motion": "^12.35.2",
     "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.0",
-    "mongoose": "^7.2.1",
+    "mongoose": "^7.8.9",
     "mysql2": "^3.17.1",
     "sequelize": "^6.37.7"
   },

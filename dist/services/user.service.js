@@ -22,49 +22,57 @@ const generateToken = (id) => {
     });
 };
 const registerUser = (userData) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, email, password, address } = userData;
-    const userExists = yield user_model_1.default.findOne({ where: { email } });
+    const { firstName, lastName, email, password, phone, address, city, pincode } = userData;
+    const userExists = yield user_model_1.default.findOne({ where: { email: email === null || email === void 0 ? void 0 : email.toLowerCase() } });
     if (userExists) {
         throw new Error('User already exists');
     }
     const user = yield user_model_1.default.create({
-        name,
+        firstName,
+        lastName,
         email,
         password,
+        phone,
         address,
+        city,
+        pincode,
     });
-    if (user) {
-        return {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            address: user.address,
-            token: generateToken(user.id),
-        };
-    }
-    else {
-        throw new Error('Invalid user data');
-    }
+    return {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phone: user.phone,
+        address: user.address,
+        city: user.city,
+        pincode: user.pincode,
+        token: generateToken(user.id),
+    };
 });
 exports.registerUser = registerUser;
 const loginUser = (userData) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = userData;
-    const user = yield user_model_1.default.findOne({ where: { email } });
+    const user = yield user_model_1.default.scope('withPassword').findOne({ where: { email: email === null || email === void 0 ? void 0 : email.toLowerCase() } });
     if (user && (yield bcryptjs_1.default.compare(password, user.password))) {
         return {
             id: user.id,
-            name: user.name,
+            firstName: user.firstName,
+            lastName: user.lastName,
             email: user.email,
+            phone: user.phone,
+            address: user.address,
+            city: user.city,
+            pincode: user.pincode,
             token: generateToken(user.id),
         };
     }
-    else {
-        throw new Error('Invalid credentials');
-    }
+    throw new Error('Invalid credentials');
 });
 exports.loginUser = loginUser;
 const getUserProfile = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield user_model_1.default.findByPk(userId, { attributes: { exclude: ['password'] } });
+    const user = yield user_model_1.default.findByPk(Number(userId), {
+        attributes: { exclude: ['password'] },
+    });
     if (!user) {
         throw new Error('User not found');
     }
@@ -72,25 +80,30 @@ const getUserProfile = (userId) => __awaiter(void 0, void 0, void 0, function* (
 });
 exports.getUserProfile = getUserProfile;
 const updateUserProfile = (userId, userData) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield user_model_1.default.findByPk(userId);
-    if (user) {
-        user.name = userData.name || user.name;
-        user.email = userData.email || user.email;
-        user.address = userData.address || user.address;
-        if (userData.password) {
-            user.password = userData.password;
-        }
-        const updatedUser = yield user.save();
-        return {
-            id: updatedUser.id,
-            name: updatedUser.name,
-            email: updatedUser.email,
-            address: updatedUser.address,
-            token: generateToken(updatedUser.id),
-        };
-    }
-    else {
+    const user = yield user_model_1.default.scope('withPassword').findByPk(Number(userId));
+    if (!user) {
         throw new Error('User not found');
     }
+    user.firstName = userData.firstName || user.firstName;
+    user.lastName = userData.lastName || user.lastName;
+    user.email = userData.email || user.email;
+    user.phone = userData.phone || user.phone;
+    user.address = userData.address || user.address;
+    user.city = userData.city || user.city;
+    user.pincode = userData.pincode || user.pincode;
+    if (userData.password)
+        user.password = userData.password;
+    const updatedUser = yield user.save();
+    return {
+        id: updatedUser.id,
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        email: updatedUser.email,
+        phone: updatedUser.phone,
+        address: updatedUser.address,
+        city: updatedUser.city,
+        pincode: updatedUser.pincode,
+        token: generateToken(updatedUser.id),
+    };
 });
 exports.updateUserProfile = updateUserProfile;

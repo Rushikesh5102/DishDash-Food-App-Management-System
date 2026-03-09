@@ -40,6 +40,15 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Backend is running' });
 });
 
+// ✅ Root endpoint for quick browser check
+app.get('/', (req, res) => {
+  res.json({
+    message: 'DishDash backend is running',
+    health: '/health',
+    apiBase: '/api',
+  });
+});
+
 // ✅ Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);

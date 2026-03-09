@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/authContext';
 import { ProtectedRoute } from '@/lib/ProtectedRoute';
 import { API_BASE_URL } from '@/lib/api';
+import { getErrorMessage, readResponseBody } from '@/lib/http';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
@@ -53,10 +54,11 @@ export default function OrdersPage() {
         }
       );
 
-      if (response.ok) {
-        const data = await response.json();
-        setOrders(data.orders || data.data || []);
+      const body = await readResponseBody(response);
+      if (!response.ok) {
+        throw new Error(getErrorMessage(body, response.status));
       }
+      setOrders(body?.orders || body?.data || []);
     } catch (err: any) {
       setError(err.message);
     } finally {

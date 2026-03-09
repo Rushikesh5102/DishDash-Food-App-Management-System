@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/authContext';
 import { ProtectedRoute } from '@/lib/ProtectedRoute';
 import { API_BASE_URL } from '@/lib/api';
+import { getErrorMessage, readResponseBody } from '@/lib/http';
 import { motion } from 'framer-motion';
 
 interface OrderStats {
@@ -35,29 +36,30 @@ export default function AnalyticsPage() {
         },
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        const rawStats = data.stats || data.data;
-        if (!rawStats) {
-          setStats(null);
-          return;
-        }
-
-        const byStatusArray = Array.isArray(rawStats.byStatus) ? rawStats.byStatus : [];
-        const byStatusRecord = byStatusArray.reduce((acc: Record<string, number>, row: any) => {
-          const key = row.status || 'unknown';
-          const count = Number(row.count || 0);
-          acc[key] = count;
-          return acc;
-        }, {});
-
-        setStats({
-          totalOrders: Number(rawStats.totalOrders || 0),
-          totalSpent: Number(rawStats.totalSpent || 0),
-          totalSaved: Number(rawStats.totalSaved || 0),
-          byStatus: byStatusRecord,
-        });
+      const body = await readResponseBody(response);
+      if (!response.ok) {
+        throw new Error(getErrorMessage(body, response.status));
       }
+      const rawStats = body?.stats || body?.data;
+      if (!rawStats) {
+        setStats(null);
+        return;
+      }
+
+      const byStatusArray = Array.isArray(rawStats.byStatus) ? rawStats.byStatus : [];
+      const byStatusRecord = byStatusArray.reduce((acc: Record<string, number>, row: any) => {
+        const key = row.status || 'unknown';
+        const count = Number(row.count || 0);
+        acc[key] = count;
+        return acc;
+      }, {});
+
+      setStats({
+        totalOrders: Number(rawStats.totalOrders || 0),
+        totalSpent: Number(rawStats.totalSpent || 0),
+        totalSaved: Number(rawStats.totalSaved || 0),
+        byStatus: byStatusRecord,
+      });
     } catch (err: any) {
       setError(err.message);
     } finally {

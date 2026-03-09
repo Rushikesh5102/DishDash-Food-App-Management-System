@@ -1,80 +1,88 @@
-import { Model, DataTypes, Sequelize } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/db';
 
 class Restaurant extends Model {
   public id!: number;
   public name!: string;
-  public address!: string;
-  public cuisine!: string;
-
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public location!: string;
+  public cuisineType!: string;
 }
-
-Restaurant.init({
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  address: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  cuisine: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-}, {
-  sequelize,
-  tableName: 'restaurants',
-  timestamps: false,
-});
 
 class MenuItem extends Model {
   public id!: number;
+  public restaurantId!: number;
   public name!: string;
   public description!: string;
   public price!: number;
   public category!: string;
-  public restaurantId!: number;
-
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
 }
 
-MenuItem.init({
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
+Restaurant.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    location: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      field: 'location',
+    },
+    cuisineType: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: '',
+    },
   },
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  description: {
-    type: DataTypes.TEXT,
-    allowNull: false,
-  },
-  price: {
-    type: DataTypes.DECIMAL(10, 2),
-    allowNull: false,
-  },
-  category: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-}, {
-  sequelize,
-  tableName: 'menu_items',
-});
+  {
+    sequelize,
+    tableName: 'restaurants',
+    timestamps: true,
+    updatedAt: false,
+  }
+);
 
-Restaurant.hasMany(MenuItem, { foreignKey: 'restaurantId' });
+MenuItem.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    restaurantId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    price: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+    category: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  },
+  {
+    sequelize,
+    tableName: 'menu_items',
+    timestamps: true,
+  }
+);
+
+Restaurant.hasMany(MenuItem, { foreignKey: 'restaurantId', onDelete: 'CASCADE' });
 MenuItem.belongsTo(Restaurant, { foreignKey: 'restaurantId' });
 
 export { Restaurant, MenuItem };

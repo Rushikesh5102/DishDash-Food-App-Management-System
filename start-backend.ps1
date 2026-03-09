@@ -1,5 +1,5 @@
 # Start Backend Server
-# Port: 5000
+# Port: 5001
 
 Write-Host "======================================" -ForegroundColor Cyan
 Write-Host "🚀 Starting DishDash Backend Server" -ForegroundColor Green
@@ -24,8 +24,8 @@ npm run build
 # Start the server
 Write-Host ""
 Write-Host "🌐 Backend Server Details:" -ForegroundColor Cyan
-Write-Host "  URL: http://localhost:5000" -ForegroundColor White
-Write-Host "  API Base: http://localhost:5000/api" -ForegroundColor White
+Write-Host "  URL: http://localhost:5001" -ForegroundColor White
+Write-Host "  API Base: http://localhost:5001/api" -ForegroundColor White
 Write-Host ""
 
 npm run dev

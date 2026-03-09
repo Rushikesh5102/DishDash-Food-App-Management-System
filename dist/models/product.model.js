@@ -10,17 +10,18 @@ Product.init({
         autoIncrement: true,
         primaryKey: true,
     },
+    restaurantId: {
+        type: sequelize_1.DataTypes.INTEGER,
+        allowNull: false,
+    },
     name: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
     },
     category: {
         type: sequelize_1.DataTypes.STRING,
-        allowNull: false,
-    },
-    restaurantName: {
-        type: sequelize_1.DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: '',
     },
     imageUrl: {
         type: sequelize_1.DataTypes.STRING,
@@ -30,5 +31,6 @@ Product.init({
     sequelize: db_1.sequelize,
     tableName: 'products',
     timestamps: true,
+    updatedAt: false,
 });
 exports.default = Product;

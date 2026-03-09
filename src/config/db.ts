@@ -3,28 +3,32 @@ import dotenv from 'dotenv';
 
 dotenv.config({ override: true });
 
-// Exporting the sequelize instance
 export const sequelize = new Sequelize(
   process.env.MYSQL_DATABASE || 'food_delivery',
   process.env.MYSQL_USER || 'root',
   process.env.MYSQL_PASSWORD || 'root',
   {
     host: process.env.MYSQL_HOST || 'localhost',
+    port: Number(process.env.MYSQL_PORT || 3306),
     dialect: 'mysql',
     logging: false,
   }
 );
 
-// Exporting the connection function
 export const connectMySQL = async () => {
   try {
-    console.log(`Attempting to connect to MySQL at ${process.env.MYSQL_HOST || 'localhost'}...`);
-    console.log(`Database: ${process.env.MYSQL_DATABASE || 'food_delivery'}`);
-    console.log(`User: ${process.env.MYSQL_USER || 'root'}`);
+    const host = process.env.MYSQL_HOST || 'localhost';
+    const database = process.env.MYSQL_DATABASE || 'food_delivery';
+    const user = process.env.MYSQL_USER || 'root';
+
+    console.log(`Attempting to connect to MySQL at ${host}:${process.env.MYSQL_PORT || '3306'}...`);
+    console.log(`Database: ${database}`);
+    console.log(`User: ${user}`);
+
     await sequelize.authenticate();
-    console.log('✅ MySQL Connected successfully');
+    console.log('MySQL connected successfully');
   } catch (error) {
-    console.error('❌ Database connection failed:', error);
+    console.error('Database connection failed:', error);
     process.exit(1);
   }
 };

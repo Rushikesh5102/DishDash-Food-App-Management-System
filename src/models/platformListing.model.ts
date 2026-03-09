@@ -1,7 +1,5 @@
-import { Model, DataTypes } from "sequelize";
-import { sequelize } from "../config/db";
-import Platform from "./platform.model";
-import Product from "./product.model";
+import { DataTypes, Model } from 'sequelize';
+import { sequelize } from '../config/db';
 
 class PlatformListing extends Model {
   public id!: number;
@@ -9,9 +7,10 @@ class PlatformListing extends Model {
   public platformId!: number;
   public price!: number;
   public deliveryFee!: number;
-  public discountType!: "percentage" | "flat" | "none";
+  public discountType!: 'percentage' | 'flat' | 'none';
   public discountValue!: number;
   public etaMinutes!: number;
+  public rating!: number;
   public redirectUrl!: string;
 }
 
@@ -36,19 +35,28 @@ PlatformListing.init(
     },
     deliveryFee: {
       type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
       defaultValue: 0,
     },
     discountType: {
-      type: DataTypes.ENUM("percentage", "flat", "none"),
-      defaultValue: "none",
+      type: DataTypes.ENUM('percentage', 'flat', 'none'),
+      allowNull: false,
+      defaultValue: 'none',
     },
     discountValue: {
       type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
       defaultValue: 0,
     },
     etaMinutes: {
       type: DataTypes.INTEGER,
+      allowNull: false,
       defaultValue: 30,
+    },
+    rating: {
+      type: DataTypes.DECIMAL(2, 1),
+      allowNull: true,
+      defaultValue: 0,
     },
     redirectUrl: {
       type: DataTypes.STRING,
@@ -57,19 +65,11 @@ PlatformListing.init(
   },
   {
     sequelize,
-    tableName: "platform_listings",
-    timestamps: false,
+    tableName: 'platform_listings',
+    timestamps: true,
+    updatedAt: false,
+    indexes: [{ unique: true, fields: ['productId', 'platformId'] }],
   }
 );
-
-//
-// ✅ ASSOCIATIONS (VERY IMPORTANT)
-//
-
-PlatformListing.belongsTo(Platform, { foreignKey: "platformId" });
-Platform.hasMany(PlatformListing, { foreignKey: "platformId" });
-
-PlatformListing.belongsTo(Product, { foreignKey: "productId" });
-Product.hasMany(PlatformListing, { foreignKey: "productId" });
 
 export default PlatformListing;

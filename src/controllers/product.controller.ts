@@ -110,7 +110,7 @@ export const compareSearch = async (req: Request, res: Response) => {
       include: [
         {
           model: Restaurant,
-          attributes: ['id', 'name', 'cuisine', 'address'],
+          attributes: ['id', 'name', 'cuisineType', 'location'],
         },
       ],
     });
@@ -147,7 +147,7 @@ export const compareSearch = async (req: Request, res: Response) => {
         productName: foundProduct.name,
         productImage: foundProduct.imageUrl,
         restaurantName: (foundProduct as any).Restaurant?.name || 'Unknown',
-        restaurantCuisine: (foundProduct as any).Restaurant?.cuisine || 'Unknown',
+        restaurantCuisine: (foundProduct as any).Restaurant?.cuisineType || 'Unknown',
         platform: listing.Platform.name,
         platformLogo: listing.Platform.logoUrl,
         basePrice,
@@ -161,11 +161,11 @@ export const compareSearch = async (req: Request, res: Response) => {
       };
     });
 
-    const cheapest = comparisons.reduce((min, curr) =>
+    const cheapest = comparisons.reduce((min: any, curr: any) =>
       curr.finalPrice < min.finalPrice ? curr : min
     );
 
-    const fastestDelivery = comparisons.reduce((fastest, curr) =>
+    const fastestDelivery = comparisons.reduce((fastest: any, curr: any) =>
       curr.etaMinutes < fastest.etaMinutes ? curr : fastest
     );
 
@@ -174,8 +174,8 @@ export const compareSearch = async (req: Request, res: Response) => {
       restaurant: {
         id: (foundProduct as any).restaurantId,
         name: (foundProduct as any).Restaurant?.name || 'Unknown',
-        cuisine: (foundProduct as any).Restaurant?.cuisine || 'Unknown',
-        address: (foundProduct as any).Restaurant?.address || 'Unknown',
+        cuisine: (foundProduct as any).Restaurant?.cuisineType || 'Unknown',
+        address: (foundProduct as any).Restaurant?.location || 'Unknown',
       },
       comparisons,
       cheapest,
@@ -271,8 +271,8 @@ export const compareByRestaurant = async (req: Request, res: Response) => {
       restaurant: {
         id: restaurant.id,
         name: restaurant.name,
-        cuisine: restaurant.cuisine,
-        address: restaurant.address,
+        cuisine: (restaurant as any).cuisineType || 'Unknown',
+        address: (restaurant as any).location || 'Unknown',
       },
       productCount: products.length,
       comparisonCount: allComparisons.length,
@@ -348,7 +348,7 @@ export const compareProductByName = async (req: Request, res: Response) => {
       };
     });
 
-    const cheapest = comparisons.reduce((min, curr) =>
+    const cheapest = comparisons.reduce((min: any, curr: any) =>
       curr.finalPrice < min.finalPrice ? curr : min
     );
 

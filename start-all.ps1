@@ -1,5 +1,5 @@
 # Start backend and frontend in separate PowerShell windows.
-# Backend: http://localhost:5000
+# Backend: http://localhost:5001
 # Frontend: http://localhost:3000
 
 $projectRoot = $PSScriptRoot
@@ -21,4 +21,4 @@ Start-Process powershell -ArgumentList @(
 )
 
 Write-Host "Frontend: http://localhost:3000"
-Write-Host "Backend: http://localhost:5000"
+Write-Host "Backend: http://localhost:5001"

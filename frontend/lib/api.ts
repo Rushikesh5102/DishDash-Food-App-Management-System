@@ -3,6 +3,8 @@
  * Centralized location for all API calls
  */
 
+import { getErrorMessage, readResponseBody } from './http';
+
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
   process.env.NEXT_PUBLIC_API_URL ||
@@ -48,14 +50,15 @@ export async function apiFetch(
 
     clearTimeout(timeoutId);
 
+    const body = await readResponseBody(response);
+
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `API Error: ${response.status}`);
+      throw new Error(getErrorMessage(body, response.status));
     }
     if (response.status === 204) {
       return null;
     }
-    return await response.json().catch(() => null);
+    return body;
   } catch (error: any) {
     if (error.name === 'AbortError') {
       throw new Error(`Request timeout after ${timeout}ms`);

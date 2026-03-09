@@ -6,6 +6,9 @@ const db_1 = require("../config/db");
 class Restaurant extends sequelize_1.Model {
 }
 exports.Restaurant = Restaurant;
+class MenuItem extends sequelize_1.Model {
+}
+exports.MenuItem = MenuItem;
 Restaurant.init({
     id: {
         type: sequelize_1.DataTypes.INTEGER,
@@ -16,33 +19,38 @@ Restaurant.init({
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
     },
-    address: {
+    location: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
+        field: 'location',
     },
-    cuisine: {
+    cuisineType: {
         type: sequelize_1.DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: '',
     },
 }, {
     sequelize: db_1.sequelize,
     tableName: 'restaurants',
+    timestamps: true,
+    updatedAt: false,
 });
-class MenuItem extends sequelize_1.Model {
-}
-exports.MenuItem = MenuItem;
 MenuItem.init({
     id: {
         type: sequelize_1.DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
     },
+    restaurantId: {
+        type: sequelize_1.DataTypes.INTEGER,
+        allowNull: false,
+    },
     name: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
     },
     description: {
-        type: sequelize_1.DataTypes.TEXT,
+        type: sequelize_1.DataTypes.STRING,
         allowNull: false,
     },
     price: {
@@ -56,6 +64,7 @@ MenuItem.init({
 }, {
     sequelize: db_1.sequelize,
     tableName: 'menu_items',
+    timestamps: true,
 });
-Restaurant.hasMany(MenuItem, { foreignKey: 'restaurantId' });
+Restaurant.hasMany(MenuItem, { foreignKey: 'restaurantId', onDelete: 'CASCADE' });
 MenuItem.belongsTo(Restaurant, { foreignKey: 'restaurantId' });
