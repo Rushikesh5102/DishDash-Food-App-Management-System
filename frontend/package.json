@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "check:env": "node ./scripts/check-env.mjs",
+    "vercel:build": "npm run check:env && npm run build",
     "start": "next start",
     "lint": "eslint"
   },
