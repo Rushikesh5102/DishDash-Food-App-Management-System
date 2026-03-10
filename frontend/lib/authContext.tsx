@@ -67,20 +67,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const getCurrentUser = useCallback(async (authToken: string) => {
-    // 🚀 MOCK AUTH FALLBACK: If using mock token, restore mock user
-    if (authToken === 'mock-jwt-token-for-preview') {
-      setUser({
-        id: 999,
-        email: 'user@example.com',
-        firstName: 'Demo',
-        lastName: 'User',
-        isActive: true,
-        createdAt: new Date().toISOString(),
-      } as User);
-      setLoading(false);
-      return;
-    }
-
     try {
       const response = await fetch(buildAuthUrl('/api/auth/me'), {
         credentials: 'include',
@@ -149,25 +135,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const body = await readResponseBody(response);
 
       if (!response.ok) {
-        // 🚀 MOCK AUTH FALLBACK: If email is demo and response is 404/405
-        if (email === 'user@example.com' && (response.status === 404 || response.status === 405)) {
-          console.warn('[MockAuth] Bypassing backend for demo account login');
-          const mockResult = {
-            token: 'mock-jwt-token-for-preview',
-            user: {
-              id: 999,
-              email: 'user@example.com',
-              firstName: 'Demo',
-              lastName: 'User',
-              isActive: true,
-              createdAt: new Date().toISOString(),
-            },
-          };
-          setToken(mockResult.token);
-          setUser(mockResult.user as User);
-          localStorage.setItem('authToken', mockResult.token);
-          return;
-        }
         throw new Error(getErrorMessage(body, response.status));
       }
 
@@ -176,25 +143,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(result.user);
       localStorage.setItem('authToken', result.token);
     } catch (err: any) {
-      // 🚀 MOCK AUTH FALLBACK: If network fails entirely
-      if (email === 'user@example.com') {
-        console.warn('[MockAuth] Network error, bypassing backend for demo account login');
-        const mockResult = {
-          token: 'mock-jwt-token-for-preview',
-          user: {
-            id: 999,
-            email: 'user@example.com',
-            firstName: 'Demo',
-            lastName: 'User',
-            isActive: true,
-            createdAt: new Date().toISOString(),
-          },
-        };
-        setToken(mockResult.token);
-        setUser(mockResult.user as User);
-        localStorage.setItem('authToken', mockResult.token);
-        return;
-      }
       setError(err.message);
       throw err;
     } finally {
