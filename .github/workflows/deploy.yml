@@ -24,9 +24,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
+          node-version: "20"
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -37,7 +35,8 @@ jobs:
         run: |
           cd frontend
           rm -f .npmrc
-          npm install --force
+          # Ignore the Windows lockfile and force fresh install for Linux
+          npm install --no-package-lock
           sed -i "s/reactStrictMode: true,/reactStrictMode: true, output: 'export', basePath: '\/DishDash-Food-App-Management-System', assetPrefix: '\/DishDash-Food-App-Management-System\/',/g" next.config.ts
           npx next build
           cp out/index.html out/404.html
