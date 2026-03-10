@@ -2,12 +2,17 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: ["main"]
+  workflow_dispatch:
 
 permissions:
   contents: read
   pages: write
   id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -19,7 +24,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
@@ -31,23 +36,12 @@ jobs:
           NEXT_PUBLIC_API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
         run: |
           cd frontend
-          
-          # 🚀 FIX: Delete Windows-specific .npmrc that breaks Linux builds
           rm -f .npmrc
-          
-          npm install
-          
-          # Inject static export and basePath on-the-fly (keeps repo code unchanged)
-          # We use sed to insert these into next.config.ts only for this build
+          npm install --force
           sed -i "s/reactStrictMode: true,/reactStrictMode: true, output: 'export', basePath: '\/DishDash-Food-App-Management-System', assetPrefix: '\/DishDash-Food-App-Management-System\/',/g" next.config.ts
-          
           npx next build
-          
-          # 🚀 ZERO-BREAK NAVIGATION FIX:
-          # GitHub Pages returns 404 on refresh with Next.js. 
-          # Copying index.html to 404.html lets the frontend router handle the request correctly.
           cp out/index.html out/404.html
-          
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
