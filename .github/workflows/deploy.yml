@@ -39,6 +39,11 @@ jobs:
           
           npx next build
           
+          # 🚀 ZERO-BREAK NAVIGATION FIX:
+          # GitHub Pages returns 404 on refresh with Next.js. 
+          # Copying index.html to 404.html lets the frontend router handle the request correctly.
+          cp out/index.html out/404.html
+          
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
