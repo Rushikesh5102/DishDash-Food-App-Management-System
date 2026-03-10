@@ -31,6 +31,10 @@ jobs:
           NEXT_PUBLIC_API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
         run: |
           cd frontend
+          
+          # 🚀 FIX: Delete Windows-specific .npmrc that breaks Linux builds
+          rm -f .npmrc
+          
           npm install
           
           # Inject static export and basePath on-the-fly (keeps repo code unchanged)
