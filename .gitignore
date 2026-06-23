@@ -13,3 +13,13 @@ frontend/.env.*
 
 frontend/.next/
 frontend/out/
+
+# Log files
+*.log
+**/*.log
+**/_logs/
+
+# Local development scripts (kept locally, not tracked)
+check_env.js
+test_db_conn.js
+setup-database.js
